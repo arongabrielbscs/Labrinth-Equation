@@ -4,11 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.Vector2;
 import gg.group3.justgo.GameLevel;
+import gg.group3.justgo.math.Vector2Int;
 
 public class Entity extends Sprite {
-    private int posX, posY;
-    private int targetPosX, targetPosY;
+    private final Vector2Int pos;
+    private final Vector2Int targetPos;
 
     private static final float POS_TRANSITION_TIME = 0.3f;
     private final Interpolation posTransition = Interpolation.swingOut;
@@ -16,18 +18,18 @@ public class Entity extends Sprite {
 
     private boolean isWiggling = false;
     private float wiggleElapsed = 0f;
-    private int wiggleStartX, wiggleStartY;
-    private int wiggleTargetX, wiggleTargetY;
+    private final Vector2Int wiggleStart;
+    private final Vector2Int wiggleTarget;
     private static final float WIGGLE_TIME = 0.15f;
     private static final float WIGGLE_DISTANCE = 0.3f;
 
     public Entity(TextureRegion region, int posX, int posY) {
         super(region);
-        this.posX = posX;
-        this.posY = posY;
-        targetPosX = posX;
-        targetPosY = posY;
-        setPosition(posX * getWidth(), posY * getHeight());
+        this.pos = new Vector2Int(posX, posY);
+        this.targetPos = new Vector2Int(posX, posY);
+        this.wiggleStart = new Vector2Int();
+        this.wiggleTarget = new Vector2Int();
+        setPosition(pos.x * getWidth(), pos.y * getHeight());
     }
 
     /**
@@ -41,24 +43,19 @@ public class Entity extends Sprite {
         if (dx == 0 && dy == 0) return false;
 
         // If we're already moving, snap to current target and start new movement
-        if (posX != targetPosX || posY != targetPosY) {
-            posX = targetPosX;
-            posY = targetPosY;
+        if (!pos.equals(targetPos)) {
+            pos.set(targetPos);
             isWiggling = false;
         }
 
-        int newTargetPosX = targetPosX + dx;
-        int newTargetPosY = targetPosY + dy;
+        Vector2Int newTargetPos = targetPos.cpy().add(dx, dy);
 
-        if (level.isCollidable(newTargetPosX, newTargetPosY)) {
+        if (level.isCollidable(newTargetPos.x, newTargetPos.y)) {
             startWiggle(dx, dy);
             return false;
         }
 
-        targetPosX = newTargetPosX;
-        targetPosY = newTargetPosY;
-
-//        Gdx.app.log("Entity Move", String.format("Moved to position: %d, %d", targetPosX, targetPosY));
+        targetPos.set(newTargetPos);
 
         // Reset interpolation
         transitionElapsed = 0f;
@@ -68,6 +65,16 @@ public class Entity extends Sprite {
         return true;
     }
 
+    /**
+     * Overloaded move method that accepts a Vector2Int for direction
+     * @param direction Vector2Int representing the movement direction
+     * @param level to know where is the wall or a floor etc.
+     * @return returns `true` if the player move succeeded, or if direction is not zero
+     */
+    public boolean move(Vector2Int direction, GameLevel level) {
+        return move(direction.x, direction.y, level);
+    }
+
     public void update(float dt) {
         // Handle wiggle animation first (takes priority)
         if (isWiggling) {
@@ -75,36 +82,33 @@ public class Entity extends Sprite {
             return;
         }
 
-        if (posX == targetPosX && posY == targetPosY) return;
+        if (pos.equals(targetPos)) return;
         transitionElapsed += dt;
         float progress = Math.min(1f, transitionElapsed / POS_TRANSITION_TIME);
         float interpolatedProgress = posTransition.apply(progress);
 
         // Update Sprite position directly
-        float currentX = posX + (targetPosX - posX) * interpolatedProgress;
-        float currentY = posY + (targetPosY - posY) * interpolatedProgress;
+        float currentX = pos.x + (targetPos.x - pos.x) * interpolatedProgress;
+        float currentY = pos.y + (targetPos.y - pos.y) * interpolatedProgress;
 
         // World -> Pixels
         setPosition(currentX * getWidth(), currentY * getHeight());
 
         // Check if the transition is complete
         if (progress >= 1f) {
-            posX = targetPosX;
-            posY = targetPosY;
+            pos.set(targetPos);
             transitionElapsed = 0f;
-            setPosition(posX * getWidth(), posY * getHeight());
+            setPosition(pos.x * getWidth(), pos.y * getHeight());
         }
     }
 
     private void startWiggle(int dx, int dy) {
         isWiggling = true;
         wiggleElapsed = 0f;
-        wiggleStartX = targetPosX;
-        wiggleStartY = targetPosY;
+        wiggleStart.set(targetPos);
 
         // Use the full movement direction for wiggle
-        wiggleTargetX = targetPosX + dx;
-        wiggleTargetY = targetPosY + dy;
+        wiggleTarget.set(targetPos).add(dx, dy);
 
         if (dx != 0) {
             setFlip(dx <= 0, false);
@@ -120,28 +124,110 @@ public class Entity extends Sprite {
         float wiggleOffset = (float)Math.sin(progress * Math.PI * 2) * WIGGLE_DISTANCE * wiggleIntensity;
 
         // Apply the wiggle in the direction we tried to move
-        float currentX = wiggleStartX + (wiggleTargetX - wiggleStartX) * wiggleOffset;
-        float currentY = wiggleStartY + (wiggleTargetY - wiggleStartY) * wiggleOffset;
+        float currentX = wiggleStart.x + (wiggleTarget.x - wiggleStart.x) * wiggleOffset;
+        float currentY = wiggleStart.y + (wiggleTarget.y - wiggleStart.y) * wiggleOffset;
 
         setPosition(currentX * getWidth(), currentY * getHeight());
 
         if (progress >= 1f) {
             isWiggling = false;
             wiggleElapsed = 0f;
-            setPosition(posX * getWidth(), posY * getHeight());
+            setPosition(pos.x * getWidth(), pos.y * getHeight());
         }
     }
 
+    // Getter methods using Vector2Int
+    public Vector2Int getPos() {
+        return pos.cpy();
+    }
+
+    public Vector2Int getTargetPos() {
+        return targetPos.cpy();
+    }
 
     public int getPosX() {
-        return posX;
+        return pos.x;
     }
 
     public int getPosY() {
-        return posY;
+        return pos.y;
     }
 
-    public float getWorldPosX() { return (float)targetPosX * getWidth(); }
+    public float getWorldPosX() {
+        return (float)targetPos.x * getWidth();
+    }
 
-    public float getWorldPosY() { return (float)targetPosY * getHeight(); }
+    public float getWorldPosY() {
+        return (float)targetPos.y * getHeight();
+    }
+
+    /**
+     * Get the current world position as a Vector2
+     * @return Vector2 representing the current world position in pixels
+     */
+    public Vector2 getWorldPos() {
+        return new Vector2(getWorldPosX(), getWorldPosY());
+    }
+
+    /**
+     * Calculate the distance to another entity
+     * @param other The other entity
+     * @return The distance in tiles
+     */
+    public float distanceTo(Entity other) {
+        return pos.dst(other.pos);
+    }
+
+    /**
+     * Calculate the Manhattan distance to another entity (useful for pathfinding)
+     * @param other The other entity
+     * @return The Manhattan distance in tiles
+     */
+    public int manhattanDistanceTo(Entity other) {
+        return pos.manhattanDistance(other.pos);
+    }
+
+    /**
+     * Check if this entity is adjacent to another entity
+     * @param other The other entity
+     * @return true if the entities are adjacent (distance of 1 tile)
+     */
+    public boolean isAdjacentTo(Entity other) {
+        return manhattanDistanceTo(other) == 1;
+    }
+
+    /**
+     * Get the direction vector to another entity
+     * @param other The other entity
+     * @return Vector2Int representing the direction (will be normalized to unit directions)
+     */
+    public Vector2Int getDirectionTo(Entity other) {
+        Vector2Int direction = other.pos.cpy().sub(pos);
+        // Normalize to unit directions for grid-based movement
+        if (direction.x != 0) direction.x = direction.x > 0 ? 1 : -1;
+        if (direction.y != 0) direction.y = direction.y > 0 ? 1 : -1;
+        return direction;
+    }
+
+    /**
+     * Set the entity's position directly (useful for teleporting)
+     * @param newPos The new position
+     */
+    public void setPos(Vector2Int newPos) {
+        pos.set(newPos);
+        targetPos.set(newPos);
+        setPosition(pos.x * getWidth(), pos.y * getHeight());
+        transitionElapsed = 0f;
+        isWiggling = false;
+    }
+
+    /**
+     * Set the entity's position directly (useful for teleporting)
+     * @param x The new x position
+     * @param y The new y position
+     */
+    public void setPos(int x, int y) {
+        setPos(new Vector2Int(x, y));
+    }
 }
+

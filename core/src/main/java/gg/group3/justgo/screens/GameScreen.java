@@ -4,19 +4,20 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import gg.group3.justgo.GameLevel;
 import gg.group3.justgo.JustGo;
 import gg.group3.justgo.entities.Entity;
+import gg.group3.justgo.math.Vector2Int;
 import gg.group3.justgo.utils.InputUtils;
 
 
 public class GameScreen implements Screen {
     private final JustGo game;
     private final Entity player;
+    private final Array<Entity> doors;
 
     private final GameLevel level;
     private final OrthogonalTiledMapRenderer tiledMapRenderer;
@@ -27,8 +28,15 @@ public class GameScreen implements Screen {
         tiledMapRenderer = new OrthogonalTiledMapRenderer(level.getRawLevel());
         player = new Entity(
             new TextureRegion(game.atlas, 0, 0, 16, 16),
-            level.getStartPlayerX(), level.getStartPlayerY()
+            level.getPlayerPosition().x,
+            level.getPlayerPosition().y
         );
+
+        Array<Vector2Int> doorPositions = level.getDoorPositions();
+        doors = new Array<>(doorPositions.size);
+        for (Vector2Int doorPos : doorPositions) {
+            doors.add(new Entity(new TextureRegion(game.atlas, 16, 32, 16, 16), doorPos.x, doorPos.y));
+        }
     }
 
     private void update(float dt) {
@@ -56,6 +64,9 @@ public class GameScreen implements Screen {
 
         tiledMapRenderer.render();
         player.draw(game.batch);
+        for (Entity door : doors) {
+            door.draw(game.batch);
+        }
 
         game.batch.end();
     }

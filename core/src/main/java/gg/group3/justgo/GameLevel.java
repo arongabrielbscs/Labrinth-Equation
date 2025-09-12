@@ -7,10 +7,13 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.utils.Array;
+import gg.group3.justgo.math.Vector2Int;
 
 public class GameLevel {
     private final boolean[][] collidables;
-    private int startPlayerX, startPlayerY;
+    private Vector2Int playerPosition;
+    private final Array<Vector2Int> doorPositions;
     private final TiledMap rawLevel;
     private final int width, height;
 
@@ -19,6 +22,7 @@ public class GameLevel {
 
         // Initialize the Entities
         MapLayer entityLayer = rawLevel.getLayers().get("Entities");
+        doorPositions = new Array<>();
         for (MapObject obj : entityLayer.getObjects()) {
             float x = obj.getProperties().get("x", float.class);
             float y = obj.getProperties().get("y", float.class);
@@ -26,8 +30,9 @@ public class GameLevel {
             float h = obj.getProperties().get("height", float.class);
 
             if (obj.getName().equals("Player")) {
-                startPlayerX = (int)(x/w);
-                startPlayerY = (int)(y/h);
+                playerPosition = new Vector2Int((int)(x/w), (int)(y/h));
+            } else if (obj.getName().equals("Door")) {
+                doorPositions.add(new Vector2Int((int)(x/w), (int)(y/h)));
             }
         }
 
@@ -81,11 +86,9 @@ public class GameLevel {
         return rawLevel;
     }
 
-    public int getStartPlayerX() {
-        return startPlayerX;
-    }
+    public Vector2Int getPlayerPosition() { return playerPosition; }
 
-    public int getStartPlayerY() {
-        return startPlayerY;
+    public Array<Vector2Int> getDoorPositions() {
+        return doorPositions;
     }
 }
