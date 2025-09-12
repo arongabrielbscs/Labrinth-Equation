@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import gg.group3.justgo.GameLevel;
 import gg.group3.justgo.math.Vector2Int;
 
@@ -37,9 +38,10 @@ public class Entity extends Sprite {
      * @param dx x value of how much does the entity move
      * @param dy y value of how much does the entity move
      * @param level to know where is the wall or a floor etc.
+     * @param collidables any entities that are solids and immovable
      * @return returns `true` if the player move succeeded, or if dx and dy != 0
      */
-    public boolean move(int dx, int dy, GameLevel level) {
+    public boolean move(int dx, int dy, GameLevel level, Array<Entity> collidables) {
         if (dx == 0 && dy == 0) return false;
 
         // If we're already moving, snap to current target and start new movement
@@ -53,6 +55,13 @@ public class Entity extends Sprite {
         if (level.isCollidable(newTargetPos.x, newTargetPos.y)) {
             startWiggle(dx, dy);
             return false;
+        }
+
+        for (Entity e : collidables) {
+            if (e.getPos().equals(newTargetPos)) {
+                startWiggle(dx, dy);
+                return false;
+            }
         }
 
         targetPos.set(newTargetPos);
@@ -69,10 +78,11 @@ public class Entity extends Sprite {
      * Overloaded move method that accepts a Vector2Int for direction
      * @param direction Vector2Int representing the movement direction
      * @param level to know where is the wall or a floor etc.
+     * @param collidables any entities that are solids and immovable
      * @return returns `true` if the player move succeeded, or if direction is not zero
      */
-    public boolean move(Vector2Int direction, GameLevel level) {
-        return move(direction.x, direction.y, level);
+    public boolean move(Vector2Int direction, GameLevel level, Array<Entity> collidables) {
+        return move(direction.x, direction.y, level, collidables);
     }
 
     public void update(float dt) {

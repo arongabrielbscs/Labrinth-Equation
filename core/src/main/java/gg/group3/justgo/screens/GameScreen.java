@@ -46,7 +46,7 @@ public class GameScreen implements Screen {
         if (InputUtils.isKeysJustPressed(Input.Keys.W, Input.Keys.UP)) dirY += 1;
         if (InputUtils.isKeysJustPressed(Input.Keys.S, Input.Keys.DOWN)) dirY -= 1;
 
-        if (player.move(dirX, dirY, level)) {
+        if (player.move(dirX, dirY, level, doors)) {
             // TODO End Turn
             System.out.println("Player Successfully moved");
         }
