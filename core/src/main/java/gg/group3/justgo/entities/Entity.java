@@ -58,7 +58,7 @@ public class Entity extends Sprite {
         targetPosX = newTargetPosX;
         targetPosY = newTargetPosY;
 
-        Gdx.app.log("Entity Move", String.format("Moved to position: %d, %d", targetPosX, targetPosY));
+//        Gdx.app.log("Entity Move", String.format("Moved to position: %d, %d", targetPosX, targetPosY));
 
         // Reset interpolation
         transitionElapsed = 0f;

@@ -23,7 +23,7 @@ public class GameScreen implements Screen {
 
     public GameScreen(JustGo game) {
         this.game = game;
-        level = new GameLevel("levels/testLevel.tmx");
+        level = new GameLevel("levels/testlevel.tmx");
         tiledMapRenderer = new OrthogonalTiledMapRenderer(level.getRawLevel());
         player = new Entity(
             new TextureRegion(game.atlas, 0, 0, 16, 16),
