@@ -1,5 +1,6 @@
 package gg.group3.justgo.screens;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -35,7 +36,12 @@ public class GameScreen implements Screen {
         Array<Vector2Int> doorPositions = level.getDoorPositions();
         doors = new Array<>(doorPositions.size);
         for (Vector2Int doorPos : doorPositions) {
-            doors.add(new Entity(new TextureRegion(game.atlas, 16, 32, 16, 16), doorPos.x, doorPos.y));
+            doors.add(
+                new Entity(new TextureRegion(game.atlas, 16, 32, 16, 16), doorPos.x, doorPos.y)
+                    .withCollisionCallback((parent, other) -> {
+                        Gdx.app.log("Entity Screen", "View the Screen");
+                    })
+            );
         }
     }
 

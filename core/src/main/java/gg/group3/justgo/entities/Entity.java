@@ -1,6 +1,5 @@
 package gg.group3.justgo.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
@@ -10,8 +9,13 @@ import gg.group3.justgo.GameLevel;
 import gg.group3.justgo.math.Vector2Int;
 
 public class Entity extends Sprite {
+    public interface CollisionCallback {
+        void collided(Entity parent, Entity other);
+    }
+
     private final Vector2Int pos;
     private final Vector2Int targetPos;
+    private CollisionCallback collisionCallback = null;
 
     private static final float POS_TRANSITION_TIME = 0.3f;
     private final Interpolation posTransition = Interpolation.swingOut;
@@ -60,6 +64,7 @@ public class Entity extends Sprite {
         for (Entity e : collidables) {
             if (e.getPos().equals(newTargetPos)) {
                 startWiggle(dx, dy);
+                if (e.collisionCallback != null) e.collisionCallback.collided(e,this);
                 return false;
             }
         }
@@ -238,6 +243,11 @@ public class Entity extends Sprite {
      */
     public void setPos(int x, int y) {
         setPos(new Vector2Int(x, y));
+    }
+
+    public Entity withCollisionCallback(CollisionCallback collisionCallback) {
+        this.collisionCallback = collisionCallback;
+        return this;
     }
 }
 
