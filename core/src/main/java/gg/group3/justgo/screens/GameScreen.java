@@ -23,10 +23,15 @@ public class GameScreen implements Screen {
     private final GameLevel level;
     private final OrthogonalTiledMapRenderer tiledMapRenderer;
 
+    private final QuestionScreen questionScreen;
+    private boolean showQuestionScreen = false;
+
     public GameScreen(JustGo game) {
         this.game = game;
         level = new GameLevel("levels/testlevel.tmx");
         tiledMapRenderer = new OrthogonalTiledMapRenderer(level.getRawLevel());
+        questionScreen = new QuestionScreen(this);
+
         player = new Entity(
             new TextureRegion(game.atlas, 0, 0, 16, 16),
             level.getPlayerPosition().x,
@@ -40,6 +45,7 @@ public class GameScreen implements Screen {
                 new Entity(new TextureRegion(game.atlas, 16, 32, 16, 16), doorPos.x, doorPos.y)
                     .withCollisionCallback((parent, other) -> {
                         Gdx.app.log("Entity Screen", "View the Screen");
+                        showQuestionScreen = true;
                     })
             );
         }
@@ -86,6 +92,10 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         update(delta);
         draw();
+        if (showQuestionScreen) {
+            questionScreen.draw();
+            questionScreen.act();
+        }
     }
 
     @Override
