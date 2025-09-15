@@ -26,11 +26,33 @@ public class GameScreen implements Screen {
     private final QuestionScreen questionScreen;
     private boolean showQuestionScreen = false;
 
+    // WARN This not the best way to do it.
+    private Entity entityQuestioningLife;
+
     public GameScreen(JustGo game) {
         this.game = game;
         level = new GameLevel("levels/testlevel.tmx");
         tiledMapRenderer = new OrthogonalTiledMapRenderer(level.getRawLevel());
-        questionScreen = new QuestionScreen(this);
+        questionScreen = new QuestionScreen(new QuestionScreen.Answered() {
+            @Override
+            public void onCorrect() {
+                Gdx.input.setInputProcessor(null);
+                showQuestionScreen = false;
+                doors.removeValue(entityQuestioningLife, true);
+            }
+
+            @Override
+            public void onWrong() {
+                Gdx.input.setInputProcessor(null);
+                showQuestionScreen = false;
+            }
+
+            @Override
+            public void onCancel() {
+                Gdx.input.setInputProcessor(null);
+                showQuestionScreen = false;
+            }
+        });
 
         player = new Entity(
             new TextureRegion(game.atlas, 0, 0, 16, 16),
@@ -45,7 +67,9 @@ public class GameScreen implements Screen {
                 new Entity(new TextureRegion(game.atlas, 16, 32, 16, 16), doorPos.x, doorPos.y)
                     .withCollisionCallback((parent, other) -> {
                         Gdx.app.log("Entity Screen", "View the Screen");
+                        entityQuestioningLife = parent;
                         showQuestionScreen = true;
+                        Gdx.input.setInputProcessor(questionScreen);
                     })
             );
         }
@@ -90,9 +114,10 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        update(delta);
         draw();
-        if (showQuestionScreen) {
+        if (!showQuestionScreen) {
+            update(delta);
+        } else {
             questionScreen.draw();
             questionScreen.act();
         }
@@ -100,6 +125,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        questionScreen.getViewport().update(width, height, true);
     }
 
     @Override
