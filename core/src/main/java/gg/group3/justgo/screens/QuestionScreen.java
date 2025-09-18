@@ -5,8 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -35,80 +33,9 @@ public class QuestionScreen extends Stage {
         this.correctAnswer = "9"; // For the example question "3 + 6 = ?"
 
         // Create skin
-        skin = createSkin();
+        skin = new Skin(Gdx.files.internal("ui/question-screen.skin"));
 
         setupUI();
-    }
-
-    private Skin createSkin() {
-        Skin skin = new Skin();
-
-        // Generate fonts
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Bold.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-
-        // Title font
-        parameter.size = 100;
-        BitmapFont titleFont = generator.generateFont(parameter);
-        skin.add("title-font", titleFont);
-
-        // Question font
-        parameter.size = 56;
-        BitmapFont questionFont = generator.generateFont(parameter);
-        skin.add("question-font", questionFont);
-
-        // UI font
-        parameter.size = 32;
-        BitmapFont uiFont = generator.generateFont(parameter);
-        skin.add("ui-font", uiFont);
-
-        generator.dispose();
-
-        // Create button textures
-        Texture buttonTexture = createColorTexture(200, 60, new Color(0.2f, 0.6f, 0.2f, 1f)); // Green
-        Texture buttonPressedTexture = createColorTexture(200, 60, new Color(0.1f, 0.5f, 0.1f, 1f)); // Darker green
-        Texture cancelButtonTexture = createColorTexture(200, 60, new Color(0.6f, 0.2f, 0.2f, 1f)); // Red
-        Texture cancelButtonPressedTexture = createColorTexture(200, 60, new Color(0.5f, 0.1f, 0.1f, 1f)); // Darker red
-
-        // Create text field texture
-        Texture textFieldTexture = createColorTexture(300, 50, new Color(0.3f, 0.3f, 0.3f, 1f)); // Dark gray
-        Texture textFieldFocusTexture = createColorTexture(300, 50, new Color(0.4f, 0.4f, 0.4f, 1f)); // Lighter gray
-
-        // Label styles
-        Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont, Color.WHITE);
-        skin.add("title", titleStyle);
-
-        Label.LabelStyle questionStyle = new Label.LabelStyle(questionFont, Color.WHITE);
-        skin.add("question", questionStyle);
-
-        Label.LabelStyle defaultStyle = new Label.LabelStyle(uiFont, Color.WHITE);
-        skin.add("default", defaultStyle);
-
-        // Button styles
-        TextButton.TextButtonStyle submitButtonStyle = new TextButton.TextButtonStyle();
-        submitButtonStyle.font = uiFont;
-        submitButtonStyle.fontColor = Color.WHITE;
-        submitButtonStyle.up = new TextureRegionDrawable(buttonTexture);
-        submitButtonStyle.down = new TextureRegionDrawable(buttonPressedTexture);
-        skin.add("submit", submitButtonStyle);
-
-        TextButton.TextButtonStyle cancelButtonStyle = new TextButton.TextButtonStyle();
-        cancelButtonStyle.font = uiFont;
-        cancelButtonStyle.fontColor = Color.WHITE;
-        cancelButtonStyle.up = new TextureRegionDrawable(cancelButtonTexture);
-        cancelButtonStyle.down = new TextureRegionDrawable(cancelButtonPressedTexture);
-        skin.add("cancel", cancelButtonStyle);
-
-        // TextField style
-        TextField.TextFieldStyle textFieldStyle = new TextField.TextFieldStyle();
-        textFieldStyle.font = uiFont;
-        textFieldStyle.fontColor = Color.WHITE;
-        textFieldStyle.background = new TextureRegionDrawable(textFieldTexture);
-        textFieldStyle.focusedBackground = new TextureRegionDrawable(textFieldFocusTexture);
-        textFieldStyle.cursor = new TextureRegionDrawable(createColorTexture(2, 30, Color.WHITE));
-        skin.add("default", textFieldStyle);
-
-        return skin;
     }
 
     private Texture createColorTexture(int width, int height, Color color) {
