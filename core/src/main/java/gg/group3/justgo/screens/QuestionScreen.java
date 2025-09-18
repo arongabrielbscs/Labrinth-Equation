@@ -1,22 +1,19 @@
 package gg.group3.justgo.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import gg.group3.justgo.entities.Entity;
 
 public class QuestionScreen extends Stage {
     public interface Answered {
-        void onCorrect();
-        void onWrong();
+        void onCorrect(Entity whoQuestionedThePlayer);
+        void onWrong(Entity whoQuestionedThePlayer);
         void onCancel();
     }
 
@@ -24,7 +21,11 @@ public class QuestionScreen extends Stage {
     private final Answered answered;
     private final Skin skin;
     private TextField answerField;
+    private Label questionLabel;
     private String correctAnswer;
+    private boolean isVisible = false;
+
+    private Entity whoQuestionedThePlayer = null;
 
     public QuestionScreen(Answered answered) {
         super(new ScreenViewport());
@@ -38,15 +39,6 @@ public class QuestionScreen extends Stage {
         setupUI();
     }
 
-    private Texture createColorTexture(int width, int height, Color color) {
-        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
-        pixmap.setColor(color);
-        pixmap.fill();
-        Texture texture = new Texture(pixmap);
-        pixmap.dispose();
-        return texture;
-    }
-
     private void setupUI() {
         Table mainTable = new Table();
         mainTable.setFillParent(true);
@@ -56,7 +48,7 @@ public class QuestionScreen extends Stage {
         Label titleLabel = new Label("Question", skin, "title");
 
         // Question
-        Label questionLabel = new Label("3 + 6 = ?", skin, "question");
+        questionLabel = new Label("", skin, "question");
 
         // Answer input field
         answerField = new TextField("", skin);
@@ -81,6 +73,7 @@ public class QuestionScreen extends Stage {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 answered.onCancel();
+                hide();
             }
         });
 
@@ -95,30 +88,55 @@ public class QuestionScreen extends Stage {
         mainTable.add(buttonTable).center();
 
         addActor(mainTable);
+    }
 
-        // Set focus to text field
-        setKeyboardFocus(answerField);
+    public void show() {
+        if (!isVisible) {
+            isVisible = true;
+            // Store the current input processor
+            // Set this stage as the input processor
+            Gdx.input.setInputProcessor(this);
+            // Set focus to text field
+            setKeyboardFocus(answerField);
+        }
+    }
+
+    public void hide() {
+        if (isVisible) {
+            isVisible = false;
+            // Restore the previous input processor
+            Gdx.input.setInputProcessor(null);
+        }
     }
 
     private void checkAnswer() {
         String userAnswer = answerField.getText().trim();
 
         if (userAnswer.equals(correctAnswer)) {
-            answered.onCorrect();
+            answered.onCorrect(this.whoQuestionedThePlayer);
+            hide();
         } else {
-            answered.onWrong();
+            answered.onWrong(this.whoQuestionedThePlayer);
         }
     }
 
-    // Method to set a new question
-    public void setQuestion(String question, String answer) {
+    public void setQuestion(String question, String answer, Entity whoQuestionedThePlayer) {
         this.correctAnswer = answer;
-        // You'd need to store references to the labels to update them
-        // Or recreate the UI - depends on your needs
+        questionLabel.setText(question);
+        answerField.setText(""); // Clear the answer field
+        this.whoQuestionedThePlayer = whoQuestionedThePlayer;
+    }
+
+    public void setQuestion(String question, String answer) {
+        setQuestion(question, answer, null);
     }
 
     @Override
     public void draw() {
+        if (!isVisible) {
+            return; // Don't draw if not visible
+        }
+
         // Semi-transparent black background
         Gdx.gl.glEnable(GL20.GL_BLEND);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -128,6 +146,18 @@ public class QuestionScreen extends Stage {
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
         super.draw();
+    }
+
+    @Override
+    public void act(float delta) {
+        if (!isVisible) {
+            return; // Don't update if not visible
+        }
+        super.act(delta);
+    }
+
+    public boolean isVisible() {
+        return isVisible;
     }
 
     @Override

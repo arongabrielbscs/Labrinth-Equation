@@ -24,10 +24,6 @@ public class GameScreen implements Screen {
     private final OrthogonalTiledMapRenderer tiledMapRenderer;
 
     private final QuestionScreen questionScreen;
-    private boolean showQuestionScreen = false;
-
-    // WARN This not the best way to do it.
-    private Entity entityQuestioningLife;
 
     public GameScreen(JustGo game) {
         this.game = game;
@@ -35,22 +31,16 @@ public class GameScreen implements Screen {
         tiledMapRenderer = new OrthogonalTiledMapRenderer(level.getRawLevel());
         questionScreen = new QuestionScreen(new QuestionScreen.Answered() {
             @Override
-            public void onCorrect() {
-                Gdx.input.setInputProcessor(null);
-                showQuestionScreen = false;
-                doors.removeValue(entityQuestioningLife, true);
+            public void onCorrect(Entity whoQuestionedThePlayer) {
+                doors.removeValue(whoQuestionedThePlayer, true);
             }
 
             @Override
-            public void onWrong() {
-                Gdx.input.setInputProcessor(null);
-                showQuestionScreen = false;
+            public void onWrong(Entity whoQuestionedThePlayer) {
             }
 
             @Override
             public void onCancel() {
-                Gdx.input.setInputProcessor(null);
-                showQuestionScreen = false;
             }
         });
 
@@ -60,16 +50,14 @@ public class GameScreen implements Screen {
             level.getPlayerPosition().y
         );
 
-        Array<Vector2Int> doorPositions = level.getDoorPositions();
-        doors = new Array<>(doorPositions.size);
-        for (Vector2Int doorPos : doorPositions) {
+        doors = new Array<>();
+        for (Vector2Int doorPos : level.getDoorPositions()) {
             doors.add(
                 new Entity(new TextureRegion(game.atlas, 16, 32, 16, 16), doorPos.x, doorPos.y)
                     .withCollisionCallback((parent, other) -> {
                         Gdx.app.log("Entity Screen", "View the Screen");
-                        entityQuestioningLife = parent;
-                        showQuestionScreen = true;
-                        Gdx.input.setInputProcessor(questionScreen);
+                        questionScreen.setQuestion("What is 3+6?", "9", parent);
+                        questionScreen.show();
                     })
             );
         }
@@ -115,7 +103,7 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         draw();
-        if (!showQuestionScreen) {
+        if (!questionScreen.isVisible()) {
             update(delta);
         } else {
             questionScreen.draw();
