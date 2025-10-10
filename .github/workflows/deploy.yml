@@ -1,0 +1,60 @@
+name: Deploy LibGDX Web Build to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    # Optional: Set permissions for the GITHUB_TOKEN to allow deployment
+    permissions:
+      contents: write # Needed to push the build files back to the repository
+      pages: write   # Needed for the deployment step
+      id-token: write # Needed for trusted publishing (if using a different deploy action)
+
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
+        # Needed if the deploy action pushes to the same repo
+        with:
+          # Fetch all history for deployment to work correctly
+          fetch-depth: 0
+
+      - name: ☕ Setup Java (JDK 17)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17' # LibGDX often targets this version now
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: ⚙️ Build LibGDX HTML Project
+        run: |
+          # Use the Gradle wrapper to execute the 'html:dist' task
+          chmod +x gradlew
+          # This task compiles the GWT/RoboVM code and places output in 'html/build/dist'
+          ./gradlew html:dist
+
+      - name: 🧹 Prepare Build Artifacts for Deployment
+        # Move the compiled game files from the build directory to a standard
+        # deployment location (e.g., 'deploy_output').
+        run: |
+          mkdir deploy_output
+          cp -r html/build/dist/* deploy_output/
+
+      - name: 🚀 Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          # The token used for deployment
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # The branch GitHub Pages should serve from (usually 'gh-pages' or 'main' branch's /docs folder)
+          # We'll use the 'gh-pages' branch approach here, serving content from 'deploy_output'
+          publish_branch: gh-pages
+          # The directory containing the static files (the output from the previous step)
+          publish_dir: ./deploy_output
+          # Use CNAME if you have a custom domain
+          # cname: example.com
+          # Commit message
+          commit_message: ${{ github.event.head_commit.message }} [Automated Deployment]
