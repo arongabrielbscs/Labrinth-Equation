@@ -37,7 +37,6 @@ public class GameScreen implements Screen {
             public void onCorrect(Entity whoQuestionedThePlayer) {
                 // TODO Maybe make sure that we remove it on where we actually put it, instead of... this
                 whoQuestionedThePlayer.damage(1);
-                Gdx.app.log("Question Screen", String.format("Correct Answer!!! QH: %d", whoQuestionedThePlayer.getHealth()));
             }
 
             @Override
@@ -81,6 +80,7 @@ public class GameScreen implements Screen {
                     questionScreen.show();
                 }))
             );
+
         }
     }
 
@@ -91,15 +91,31 @@ public class GameScreen implements Screen {
         if (InputUtils.isKeysJustPressed(Input.Keys.W, Input.Keys.UP)) dirY += 1;
         if (InputUtils.isKeysJustPressed(Input.Keys.S, Input.Keys.DOWN)) dirY -= 1;
 
-        if (player.move(dirX, dirY, level, ArrayUtils.combineArrays(doors, enemies))) {
+        Array<Entity> allCollidables = ArrayUtils.combineArrays(doors, enemies);
+        if (player.move(dirX, dirY, level, allCollidables)) {
             // TODO End Turn
             System.out.println("Player Successfully moved");
 
             // Move the Enemies
+            for (Entity enemy : enemies) {
+                if (enemy.isVisibleTo(player, level, doors)) {
+                    System.out.println("Yoo");
+
+                    boolean moved = enemy.moveTowards(player, level, allCollidables);
+                    if (moved) {
+                        System.out.println("Successful Move");
+                    } else {
+                        System.out.println("Unsuccessful Move");
+                    }
+                }
+            }
         }
         game.viewport.getCamera().position.x = player.getX();
         game.viewport.getCamera().position.y = player.getY();
         player.update(dt);
+        for (Entity enemy : enemies) {
+            enemy.update(dt);
+        }
     }
 
     private void draw() {

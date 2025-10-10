@@ -65,6 +65,7 @@ public class Entity extends Sprite {
 
         for (Entity e : collidables) {
             if (e.getHealth() <= 0) continue;
+            if (e == this) continue;
             if (e.getPos().equals(newTargetPos)) {
                 startWiggle(dx, dy);
                 if (e.collisionCallback != null) e.collisionCallback.collided(e,this);
@@ -91,6 +92,141 @@ public class Entity extends Sprite {
      */
     public boolean move(Vector2Int direction, GameLevel level, Array<Entity> collidables) {
         return move(direction.x, direction.y, level, collidables);
+    }
+
+    /**
+     * Checks if this entity has a clear line of sight to another entity (e.g., Player).
+     * This uses a grid-traversal algorithm (like a simplified Bresenham) to check
+     * all tiles between the two entities for collidable walls OR other collidable entities.
+     *
+     * @param other The target entity (e.g., the player).
+     * @param level The GameLevel to check for collidable tiles (walls).
+     * @param collidables A list of entities that can block line of sight (excluding this and other).
+     * @return true if there is a clear line of sight, false otherwise.
+     */
+    public boolean isVisibleTo(Entity other, GameLevel level, Array<Entity> collidables) {
+        // Start and end positions
+        int x0 = pos.x;
+        int y0 = pos.y;
+        int x1 = other.pos.x;
+        int y1 = other.pos.y;
+
+        // Trivial case: Same position
+        if (x0 == x1 && y0 == y1) return true;
+
+        // Simplified Bresenham's-like algorithm for grid traversal
+        int dx = Math.abs(x1 - x0);
+        int dy = Math.abs(y1 - y0);
+        int sx = x0 < x1 ? 1 : -1;
+        int sy = y0 < y1 ? 1 : -1;
+        int err = (dx > dy ? dx : -dy) / 2;
+        int e2;
+
+        int currentX = x0;
+        int currentY = y0;
+
+        while (true) {
+            // Check for collision at the *intermediate* tile.
+            // We skip the starting tile (x0, y0) and the ending tile (x1, y1).
+            if (currentX != x0 || currentY != y0) {
+
+                // 1. Check for wall/level collision at the current tile
+                if (level.isCollidable(currentX, currentY)) {
+                    return false; // Obstruction found (Wall)
+                }
+
+                // 2. Check for other collidable entities at the current tile
+                //    We only check intermediate tiles. We already excluded the start/end entity.
+                for (Entity e : collidables) {
+                    // Ignore dead entities
+                    if (e.getHealth() <= 0) continue;
+
+                    // Ignore the 'other' entity if it happens to be in the collidables list
+                    if (e == other) continue;
+
+                    // Ignore the 'this' entity if it happens to be in the collidables list
+                    if (e == this) continue;
+
+                    // Check if the entity is at the current position
+                    if (e.getPos().x == currentX && e.getPos().y == currentY) {
+                        return false; // Obstruction found (Other Entity)
+                    }
+                }
+            }
+
+            if (currentX == x1 && currentY == y1) break; // Reached the target
+
+            e2 = err;
+            if (e2 > -dx) {
+                err -= dy;
+                currentX += sx;
+            }
+            if (e2 < dy) {
+                err += dx;
+                currentY += sy;
+            }
+        }
+
+        return true; // No obstructions found between the two positions
+    }
+
+    /**
+     * Attempts to move the entity one tile closer to the target entity,
+     * prioritizing movement that reduces the Manhattan distance.
+     *
+     * @param target The entity to move towards (e.g., the player).
+     * @param level The game level for wall checks.
+     * @param collidables All entities that can block the move.
+     * @return true if the move was successful, false otherwise.
+     */
+    public boolean moveTowards(Entity target, GameLevel level, Array<Entity> collidables) {
+        if (this.equals(target)) return false;
+
+        // Get the difference in position (delta)
+        int dx = target.getPosX() - this.getPosX();
+        int dy = target.getPosY() - this.getPosY();
+
+        // Determine the step magnitude (+1 or -1) for each axis
+        int stepX = Integer.compare(dx, 0);
+        int stepY = Integer.compare(dy, 0);
+
+        // Get the absolute distance remaining on each axis
+        int absDx = Math.abs(dx);
+        int absDy = Math.abs(dy);
+
+        // Create an array of potential moves (up to 2: Horizontal, Vertical)
+        Vector2Int potentialMoves[] = new Vector2Int[2];
+
+        // Prioritize the axis with the largest distance remaining (greedy approach)
+        if (absDx > absDy) {
+            // 1. Horizontal move (e.g., (1, 0) or (-1, 0))
+            potentialMoves[0] = new Vector2Int(stepX, 0);
+            // 2. Vertical move (e.g., (0, 1) or (0, -1))
+            potentialMoves[1] = new Vector2Int(0, stepY);
+        } else { // absDy >= absDx (prioritize Y or equal preference)
+            // 1. Vertical move
+            potentialMoves[0] = new Vector2Int(0, stepY);
+            // 2. Horizontal move
+            potentialMoves[1] = new Vector2Int(stepX, 0);
+        }
+
+        // Edge Case: If the target is exactly one step away diagonally (e.g., (1, 1))
+        // we only test the top priority move (e.g., (1, 0) then (0, 1)).
+        // This maintains the "single direction" constraint.
+
+        // Attempt the moves in order of priority:
+        for (Vector2Int direction : potentialMoves) {
+            // Skip zero moves (e.g., if we are already aligned on an axis)
+            if (direction.x == 0 && direction.y == 0) continue;
+
+            // Try to move. The 'move' method handles collision and wall checks.
+            if (move(direction.x, direction.y, level, collidables)) {
+                return true; // Move successful
+            }
+        }
+
+        // If no single-axis move succeeded, no movement possible this turn.
+        return false;
     }
 
     public void update(float dt) {
