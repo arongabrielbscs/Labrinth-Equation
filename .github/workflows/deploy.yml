@@ -33,6 +33,7 @@ jobs:
       - name: ⚙️ Build LibGDX HTML Project
         run: |
           # Use the Gradle wrapper to execute the 'html:dist' task
+          chmod +x gradlew
           # This task compiles the GWT/RoboVM code and places output in 'html/build/dist'
           ./gradlew html:dist
 
