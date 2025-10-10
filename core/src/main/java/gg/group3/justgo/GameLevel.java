@@ -14,8 +14,25 @@ public class GameLevel {
     private final boolean[][] collidables;
     private Vector2Int playerPosition;
     private final Array<Vector2Int> doorPositions;
+    private final Array<EnemyData> enemies;
     private final TiledMap rawLevel;
     private final int width, height;
+
+    public enum EnemyType {
+        Beanling,
+        Beanite,
+    }
+
+    public static class EnemyData {
+        public final Vector2Int position;
+        public final EnemyType type;
+
+        public EnemyData(Vector2Int position, EnemyType type) {
+            this.position = position;
+            this.type = type;
+        }
+    }
+
 
     public GameLevel(String path) {
         rawLevel = new TmxMapLoader().load(path);
@@ -23,16 +40,24 @@ public class GameLevel {
         // Initialize the Entities
         MapLayer entityLayer = rawLevel.getLayers().get("Entities");
         doorPositions = new Array<>();
+        enemies = new Array<>();
         for (MapObject obj : entityLayer.getObjects()) {
             float x = obj.getProperties().get("x", float.class);
             float y = obj.getProperties().get("y", float.class);
             float w = obj.getProperties().get("width", float.class);
             float h = obj.getProperties().get("height", float.class);
 
-            if (obj.getName().equals("Player")) {
-                playerPosition = new Vector2Int((int)(x/w), (int)(y/h));
-            } else if (obj.getName().equals("Door")) {
-                doorPositions.add(new Vector2Int((int)(x/w), (int)(y/h)));
+            final Vector2Int position = new Vector2Int((int)(x/w), (int)(y/h));
+            switch (obj.getName()) {
+                case "Player":
+                    playerPosition = position;
+                    break;
+                case "Door":
+                    doorPositions.add(position);
+                    break;
+                case "Beanling":
+                    enemies.add(new EnemyData(position, EnemyType.Beanling));
+                    break;
             }
         }
 
@@ -90,5 +115,9 @@ public class GameLevel {
 
     public Array<Vector2Int> getDoorPositions() {
         return doorPositions;
+    }
+
+    public Array<EnemyData> getEnemies() {
+        return enemies;
     }
 }

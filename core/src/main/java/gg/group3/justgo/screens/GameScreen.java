@@ -11,14 +11,17 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import gg.group3.justgo.GameLevel;
 import gg.group3.justgo.JustGo;
 import gg.group3.justgo.entities.Entity;
+import gg.group3.justgo.entities.utils.ArrayUtils;
 import gg.group3.justgo.math.Vector2Int;
 import gg.group3.justgo.utils.InputUtils;
+import gg.group3.justgo.utils.MathGen;
 
 
 public class GameScreen implements Screen {
     private final JustGo game;
     private final Entity player;
     private final Array<Entity> doors;
+    private final Array<Entity> enemies;
 
     private final GameLevel level;
     private final OrthogonalTiledMapRenderer tiledMapRenderer;
@@ -32,11 +35,15 @@ public class GameScreen implements Screen {
         questionScreen = new QuestionScreen(new QuestionScreen.Answered() {
             @Override
             public void onCorrect(Entity whoQuestionedThePlayer) {
-                doors.removeValue(whoQuestionedThePlayer, true);
+                // TODO Maybe make sure that we remove it on where we actually put it, instead of... this
+                whoQuestionedThePlayer.damage(1);
+                Gdx.app.log("Question Screen", String.format("Correct Answer!!! QH: %d", whoQuestionedThePlayer.getHealth()));
             }
 
             @Override
             public void onWrong(Entity whoQuestionedThePlayer) {
+                whoQuestionedThePlayer.heal(1);
+                Gdx.app.log("Question Screen", "Wrong Answer!!!");
             }
 
             @Override
@@ -56,9 +63,23 @@ public class GameScreen implements Screen {
                 new Entity(new TextureRegion(game.atlas, 16, 32, 16, 16), doorPos.x, doorPos.y)
                     .withCollisionCallback((parent, other) -> {
                         Gdx.app.log("Entity Screen", "View the Screen");
-                        questionScreen.setQuestion("What is 3+6?", "9", parent);
+                        MathGen question = MathGen.generateBasicArithmetic(10);
+                        questionScreen.setQuestion(question.getQuestion(), question.getAnswer(), parent);
                         questionScreen.show();
                     })
+            );
+        }
+
+        enemies = new Array<>();
+        for (GameLevel.EnemyData enemyData : level.getEnemies()) {
+            TextureRegion region = new TextureRegion(game.atlas, 3 * 16, 16, 16, 16);
+            enemies.add(new Entity(region, enemyData.position.x, enemyData.position.y)
+                .withCollisionCallback(((parent, other) -> {
+                    Gdx.app.log("Entity Screen", "View the Screen");
+                    MathGen question = MathGen.generateBasicArithmetic(30);
+                    questionScreen.setQuestion(question.getQuestion(), question.getAnswer(), parent);
+                    questionScreen.show();
+                }))
             );
         }
     }
@@ -70,9 +91,11 @@ public class GameScreen implements Screen {
         if (InputUtils.isKeysJustPressed(Input.Keys.W, Input.Keys.UP)) dirY += 1;
         if (InputUtils.isKeysJustPressed(Input.Keys.S, Input.Keys.DOWN)) dirY -= 1;
 
-        if (player.move(dirX, dirY, level, doors)) {
+        if (player.move(dirX, dirY, level, ArrayUtils.combineArrays(doors, enemies))) {
             // TODO End Turn
             System.out.println("Player Successfully moved");
+
+            // Move the Enemies
         }
         game.viewport.getCamera().position.x = player.getX();
         game.viewport.getCamera().position.y = player.getY();
@@ -89,7 +112,12 @@ public class GameScreen implements Screen {
         tiledMapRenderer.render();
         player.draw(game.batch);
         for (Entity door : doors) {
+            if (door.getHealth() <= 0) continue;
             door.draw(game.batch);
+        }
+        for (Entity enemy : enemies) {
+            if (enemy.getHealth() <= 0) continue;
+            enemy.draw(game.batch);
         }
 
         game.batch.end();
