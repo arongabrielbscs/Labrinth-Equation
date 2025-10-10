@@ -1,0 +1,15 @@
+question-screen.png
+size:2048,64
+repeat:none
+button-green
+bounds:808,2,200,60
+button-green-pressed
+bounds:1212,2,200,60
+button-red
+bounds:1010,2,200,60
+button-red-pressed
+bounds:606,2,200,60
+textfield-background
+bounds:304,12,300,50
+textfield-focused
+bounds:2,12,300,50
