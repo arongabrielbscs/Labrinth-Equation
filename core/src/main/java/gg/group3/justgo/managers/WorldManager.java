@@ -73,6 +73,7 @@ public class WorldManager {
         // 2. If player successfully moved (spent a turn), update enemies
         if (playerMoved) {
             visibilityManager.update(player.getPos(), level, doors);
+            allCollidables.add(player);
             updateEnemies(allCollidables);
         }
     }

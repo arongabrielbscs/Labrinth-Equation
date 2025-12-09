@@ -65,7 +65,7 @@ public class Entity extends Sprite {
         for (Entity e : collidables) {
             if (e.getHealth() <= 0) continue;
             if (e == this) continue;
-            if (e.getPos().equals(newTargetPos)) {
+            if (e.getPos().equals(newTargetPos) || e.getTargetPos().equals(newTargetPos)) {
                 startWiggle(dx, dy);
                 if (e.collisionCallback != null) e.collisionCallback.collided(e,this);
                 return false;
