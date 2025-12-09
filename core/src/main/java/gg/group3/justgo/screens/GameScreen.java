@@ -39,6 +39,7 @@ public class GameScreen implements Screen {
             @Override
             public void onWrong(Entity whoQuestionedThePlayer) {
                 whoQuestionedThePlayer.heal(1);
+                worldManager.getPlayer().damage(1);
                 Gdx.app.log("Question Screen", "Wrong Answer!!!");
             }
 
