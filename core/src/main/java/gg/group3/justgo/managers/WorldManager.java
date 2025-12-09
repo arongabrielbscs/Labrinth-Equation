@@ -32,10 +32,10 @@ public class WorldManager {
         );
         this.player.setHealth(5);
 
-        // Perform initial calculation so the player isn't in the dark at start
-        this.visibilityManager.update(level.getPlayerPosition(), level);
-
         initializeEntities(atlas);
+
+        // Perform initial calculation so the player isn't in the dark at start
+        this.visibilityManager.update(level.getPlayerPosition(), level, doors);
     }
 
     private void initializeEntities(Texture atlas) {
@@ -72,7 +72,7 @@ public class WorldManager {
 
         // 2. If player successfully moved (spent a turn), update enemies
         if (playerMoved) {
-            visibilityManager.update(player.getPos(), level);
+            visibilityManager.update(player.getPos(), level, doors);
             updateEnemies(allCollidables);
         }
     }

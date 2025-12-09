@@ -88,7 +88,7 @@ public class GameScreen implements Screen {
     }
 
     private void draw() {
-        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
+        ScreenUtils.clear(0, 0, 0, 1f);
         game.viewport.apply();
         tiledMapRenderer.setView((OrthographicCamera) game.viewport.getCamera());
         game.batch.setProjectionMatrix(game.viewport.getCamera().combined);

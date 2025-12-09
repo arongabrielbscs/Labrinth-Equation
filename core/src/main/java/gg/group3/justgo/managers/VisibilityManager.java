@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.Array;
 import gg.group3.justgo.GameLevel;
+import gg.group3.justgo.entities.Entity;
 import gg.group3.justgo.math.Vector2Int;
 
 public class VisibilityManager {
@@ -16,7 +18,8 @@ public class VisibilityManager {
 
     private final int width;
     private final int height;
-    private final int[][] lightMap; // Stores the state of each tile
+    private final int[][] lightMap; // Stores the state of each
+    private final boolean[][] dynamicObstacles;
     private final ShapeRenderer shapeRenderer;
 
     // How far the player can see
@@ -26,11 +29,30 @@ public class VisibilityManager {
         this.width = width;
         this.height = height;
         this.lightMap = new int[width][height];
+        this.dynamicObstacles = new boolean[width][height]; // Init helper
         this.shapeRenderer = new ShapeRenderer();
     }
 
-    public void update(Vector2Int playerPos, GameLevel level) {
-        // 1. Demote all currently "Visible" tiles to "Explored"
+    public void update(Vector2Int playerPos, GameLevel level, Array<Entity> doors) {
+        // 1. Reset and Build the Dynamic Obstacle Map
+        for(int x = 0; x < width; x++) {
+            for(int y = 0; y < height; y++) {
+                dynamicObstacles[x][y] = false;
+            }
+        }
+
+        // Mark all active (closed) doors as obstacles
+        for (Entity door : doors) {
+            if (door.getHealth() > 0) { // If health > 0, the door is closed/solid
+                // Bounds check just in case
+                if (door.getPosX() >= 0 && door.getPosX() < width &&
+                    door.getPosY() >= 0 && door.getPosY() < height) {
+                    dynamicObstacles[door.getPosX()][door.getPosY()] = true;
+                }
+            }
+        }
+
+        // 2. Demote visible tiles to explored
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 if (lightMap[x][y] == STATE_VISIBLE) {
@@ -39,11 +61,9 @@ public class VisibilityManager {
             }
         }
 
-        // 2. Cast rays to find new Visible tiles
-        // We scan a square area around the player for simplicity
+        // 3. Cast rays (Standard code)
         for (int x = -viewRadius; x <= viewRadius; x++) {
             for (int y = -viewRadius; y <= viewRadius; y++) {
-                // Check if this point is within a circle (standard distance check)
                 if (x*x + y*y <= viewRadius*viewRadius) {
                     castRay(playerPos.x, playerPos.y, playerPos.x + x, playerPos.y + y, level);
                 }
@@ -53,6 +73,7 @@ public class VisibilityManager {
 
     // A simple Bresenham Line Algorithm to check visibility
     private void castRay(int x0, int y0, int x1, int y1, GameLevel level) {
+        // ... setup Bresenham variables (dx, dy, sx, sy, err) ...
         int dx = Math.abs(x1 - x0);
         int dy = Math.abs(y1 - y0);
         int sx = x0 < x1 ? 1 : -1;
@@ -60,20 +81,21 @@ public class VisibilityManager {
         int err = dx - dy;
 
         while (true) {
-            // Check bounds
             if (x0 < 0 || x0 >= width || y0 < 0 || y0 >= height) break;
 
-            // This tile is visible
             lightMap[x0][y0] = STATE_VISIBLE;
 
-            // If we hit a wall, we stop (cannot see past it)
-            // Note: We mark the wall itself as visible before breaking
-            if (level.isCollidable(x0, y0)) {
+            // FIX: Check BOTH static walls AND dynamic obstacles (doors)
+            boolean hitWall = level.isCollidable(x0, y0);
+            boolean hitDoor = dynamicObstacles[x0][y0];
+
+            if (hitWall || hitDoor) {
                 break;
             }
 
             if (x0 == x1 && y0 == y1) break;
 
+            // ... standard loop update ...
             int e2 = 2 * err;
             if (e2 > -dy) {
                 err -= dy;
