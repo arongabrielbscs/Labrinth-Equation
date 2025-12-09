@@ -29,7 +29,11 @@ public class WorldManager {
             new TextureRegion(atlas, 0, 0, 16, 16),
             level.getPlayerPosition().x,
             level.getPlayerPosition().y
-        );
+        ).withCollisionCallback((parent, other) -> {
+            // Generate problem and notify the listener (UI)
+            MathGen problem = MathGen.generateBasicArithmetic(10);
+            listener.onQuestionTriggered(other, problem);
+        });
         this.player.setHealth(5);
 
         initializeEntities(atlas);
