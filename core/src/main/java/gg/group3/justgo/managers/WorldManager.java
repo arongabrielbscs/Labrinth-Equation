@@ -83,7 +83,6 @@ public class WorldManager {
 
             // Simple Vision Check
             if (enemy.isVisibleTo(player, level, doors)) {
-                // TODO: Replace this with A* later
                 enemy.moveTowards(player, level, allCollidables);
             }
         }

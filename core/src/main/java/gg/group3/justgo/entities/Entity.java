@@ -1,6 +1,5 @@
 package gg.group3.justgo.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
@@ -174,13 +173,12 @@ public class Entity extends Sprite {
      * Attempts to move the entity one tile closer to the target entity,
      * prioritizing movement that reduces the Manhattan distance.
      *
-     * @param target The entity to move towards (e.g., the player).
-     * @param level The game level for wall checks.
+     * @param target      The entity to move towards (e.g., the player).
+     * @param level       The game level for wall checks.
      * @param collidables All entities that can block the move.
-     * @return true if the move was successful, false otherwise.
      */
-    public boolean moveTowards(Entity target, GameLevel level, Array<Entity> collidables) {
-        if (this.equals(target)) return false;
+    public void moveTowards(Entity target, GameLevel level, Array<Entity> collidables) {
+        if (this.equals(target)) return;
 
         // Get the difference in position (delta)
         int dx = target.getPosX() - this.getPosX();
@@ -221,12 +219,11 @@ public class Entity extends Sprite {
 
             // Try to move. The 'move' method handles collision and wall checks.
             if (move(direction.x, direction.y, level, collidables)) {
-                return true; // Move successful
+                return; // Move successful
             }
         }
 
         // If no single-axis move succeeded, no movement possible this turn.
-        return false;
     }
 
     public void update(float dt) {
