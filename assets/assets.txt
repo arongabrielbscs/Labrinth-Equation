@@ -2,10 +2,10 @@ d:assets:assets:0:application/unknown:1
 i:atlas.png:atlas-22e9cbe1e3a6d73412312e7529052877.png:1231:image/png:1
 d:tilesets:tilesets:0:application/unknown:1
 b:tilesets/atlas.tsx:tilesets/atlas-bd81f41028be5204de377a1eca8beb9f.tsx:463:application/unknown:1
-b:atlas.aseprite:atlas-64b59e6f4f9c421e8c47dd45b6659284.aseprite:3162:application/unknown:1
+b:atlas.aseprite:atlas-8bba2485796a0425cb5a32ba938071ce.aseprite:3348:application/unknown:1
 t:assets.txt:assets-f5fc966ec27c931a29e9d11193c659ca.txt:368:text/plain:1
 d:images:images:0:application/unknown:1
-i:images/atlas.png:images/atlas-64981ac9a08a0a584819267c2c04d370.png:3987:image/png:1
+i:images/atlas.png:images/atlas-32cfbbb7df8939d8c9b095bbee228611.png:4180:image/png:1
 i:images/libgdx.png:images/libgdx-6ce2ac53bc1738a1e5ac95f05dceb4a5.png:2456:image/png:1
 d:ui:ui:0:application/unknown:1
 i:ui/question-screen.png:ui/question-screen-21c57d94c41ade4d9c6f46f1cde4267d.png:3486:image/png:1
