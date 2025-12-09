@@ -114,10 +114,10 @@ public class QuestionScreen extends Stage {
 
         if (userAnswer.equals(correctAnswer)) {
             answered.onCorrect(this.whoQuestionedThePlayer);
-            hide();
         } else {
             answered.onWrong(this.whoQuestionedThePlayer);
         }
+        hide();
     }
 
     public void setQuestion(String question, String answer, Entity whoQuestionedThePlayer) {
