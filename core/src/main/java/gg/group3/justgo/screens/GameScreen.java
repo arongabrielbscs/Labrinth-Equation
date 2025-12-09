@@ -12,6 +12,8 @@ import gg.group3.justgo.GameLevel;
 import gg.group3.justgo.JustGo;
 import gg.group3.justgo.entities.Entity;
 import gg.group3.justgo.entities.utils.ArrayUtils;
+import gg.group3.justgo.managers.WorldEventListener;
+import gg.group3.justgo.managers.WorldManager;
 import gg.group3.justgo.math.Vector2Int;
 import gg.group3.justgo.utils.InputUtils;
 import gg.group3.justgo.utils.MathGen;
@@ -19,19 +21,13 @@ import gg.group3.justgo.utils.MathGen;
 
 public class GameScreen implements Screen {
     private final JustGo game;
-    private final Entity player;
-    private final Array<Entity> doors;
-    private final Array<Entity> enemies;
-
-    private final GameLevel level;
     private final OrthogonalTiledMapRenderer tiledMapRenderer;
-
     private final QuestionScreen questionScreen;
+
+    private final WorldManager worldManager;
 
     public GameScreen(JustGo game) {
         this.game = game;
-        level = new GameLevel("levels/testlevel.tmx");
-        tiledMapRenderer = new OrthogonalTiledMapRenderer(level.getRawLevel());
         questionScreen = new QuestionScreen(new QuestionScreen.Answered() {
             @Override
             public void onCorrect(Entity whoQuestionedThePlayer) {
@@ -50,72 +46,40 @@ public class GameScreen implements Screen {
             }
         });
 
-        player = new Entity(
-            new TextureRegion(game.atlas, 0, 0, 16, 16),
-            level.getPlayerPosition().x,
-            level.getPlayerPosition().y
-        );
+        worldManager = new WorldManager("levels/testlevel.tmx", game.atlas, new WorldEventListener() {
+            @Override
+            public void onQuestionTriggered(Entity target, MathGen problem) {
+                // The Manager says a collision happened -> The Screen shows the UI
+                questionScreen.setQuestion(problem.getQuestion(), problem.getAnswer(), target);
+                questionScreen.show();
+            }
 
-        doors = new Array<>();
-        for (Vector2Int doorPos : level.getDoorPositions()) {
-            doors.add(
-                new Entity(new TextureRegion(game.atlas, 16, 32, 16, 16), doorPos.x, doorPos.y)
-                    .withCollisionCallback((parent, other) -> {
-                        Gdx.app.log("Entity Screen", "View the Screen");
-                        MathGen question = MathGen.generateBasicArithmetic(10);
-                        questionScreen.setQuestion(question.getQuestion(), question.getAnswer(), parent);
-                        questionScreen.show();
-                    })
-            );
-        }
+            @Override
+            public void onGameOver() {
+                // Handle Game over logic
+            }
+        });
 
-        enemies = new Array<>();
-        for (GameLevel.EnemyData enemyData : level.getEnemies()) {
-            TextureRegion region = new TextureRegion(game.atlas, 3 * 16, 16, 16, 16);
-            enemies.add(new Entity(region, enemyData.position.x, enemyData.position.y)
-                .withCollisionCallback(((parent, other) -> {
-                    Gdx.app.log("Entity Screen", "View the Screen");
-                    MathGen question = MathGen.generateBasicArithmetic(30);
-                    questionScreen.setQuestion(question.getQuestion(), question.getAnswer(), parent);
-                    questionScreen.show();
-                }))
-            );
-
-        }
+        tiledMapRenderer = new OrthogonalTiledMapRenderer(worldManager.getLevel().getRawLevel());
     }
 
     private void update(float dt) {
+        // 1. Input Handling
         int dirX = 0, dirY = 0;
         if (InputUtils.isKeysJustPressed(Input.Keys.A, Input.Keys.LEFT)) dirX -= 1;
         if (InputUtils.isKeysJustPressed(Input.Keys.D, Input.Keys.RIGHT)) dirX += 1;
         if (InputUtils.isKeysJustPressed(Input.Keys.W, Input.Keys.UP)) dirY += 1;
         if (InputUtils.isKeysJustPressed(Input.Keys.S, Input.Keys.DOWN)) dirY -= 1;
 
-        Array<Entity> allCollidables = ArrayUtils.combineArrays(doors, enemies);
-        if (player.move(dirX, dirY, level, allCollidables)) {
-            // TODO End Turn
-            System.out.println("Player Successfully moved");
-
-            // Move the Enemies
-            for (Entity enemy : enemies) {
-                if (enemy.isVisibleTo(player, level, doors)) {
-                    System.out.println("Yoo");
-
-                    boolean moved = enemy.moveTowards(player, level, allCollidables);
-                    if (moved) {
-                        System.out.println("Successful Move");
-                    } else {
-                        System.out.println("Unsuccessful Move");
-                    }
-                }
-            }
+        // 2. Delegate Logic to Manager
+        if (dirX != 0 || dirY != 0) {
+            worldManager.processTurn(dirX, dirY);
         }
-        game.viewport.getCamera().position.x = player.getX();
-        game.viewport.getCamera().position.y = player.getY();
-        player.update(dt);
-        for (Entity enemy : enemies) {
-            enemy.update(dt);
-        }
+        game.viewport.getCamera().position.x = worldManager.getPlayer().getX();
+        game.viewport.getCamera().position.y = worldManager.getPlayer().getY();
+
+        // 3. Update Animations
+        worldManager.update(dt);
     }
 
     private void draw() {
@@ -126,12 +90,12 @@ public class GameScreen implements Screen {
         game.batch.begin();
 
         tiledMapRenderer.render();
-        player.draw(game.batch);
-        for (Entity door : doors) {
+        worldManager.getPlayer().draw(game.batch);
+        for (Entity door : worldManager.getDoors()) {
             if (door.getHealth() <= 0) continue;
             door.draw(game.batch);
         }
-        for (Entity enemy : enemies) {
+        for (Entity enemy : worldManager.getEnemies()) {
             if (enemy.getHealth() <= 0) continue;
             enemy.draw(game.batch);
         }
@@ -177,6 +141,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        level.dispose();
+        questionScreen.dispose();
+        tiledMapRenderer.dispose();
+        worldManager.dispose();
     }
 }
