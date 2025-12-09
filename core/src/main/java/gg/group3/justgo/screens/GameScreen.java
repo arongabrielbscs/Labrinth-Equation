@@ -23,6 +23,7 @@ public class GameScreen implements Screen {
     private final JustGo game;
     private final OrthogonalTiledMapRenderer tiledMapRenderer;
     private final QuestionScreen questionScreen;
+    private final HUD hud;
 
     private final WorldManager worldManager;
 
@@ -61,6 +62,9 @@ public class GameScreen implements Screen {
         });
 
         tiledMapRenderer = new OrthogonalTiledMapRenderer(worldManager.getLevel().getRawLevel());
+
+        TextureRegion heartRegion = new TextureRegion(game.atlas, 0, 144, 16, 16);
+        hud = new HUD(game.batch, heartRegion);
     }
 
     private void update(float dt) {
@@ -101,6 +105,9 @@ public class GameScreen implements Screen {
         }
 
         game.batch.end();
+
+        hud.update(worldManager.getPlayer().getHealth());
+        hud.draw();
     }
 
     @Override
@@ -122,6 +129,7 @@ public class GameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         questionScreen.getViewport().update(width, height, true);
+        hud.resize(width, height);
     }
 
     @Override
@@ -144,5 +152,6 @@ public class GameScreen implements Screen {
         questionScreen.dispose();
         tiledMapRenderer.dispose();
         worldManager.dispose();
+        hud.dispose();
     }
 }

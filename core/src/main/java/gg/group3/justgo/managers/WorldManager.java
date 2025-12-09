@@ -27,6 +27,7 @@ public class WorldManager {
             level.getPlayerPosition().x,
             level.getPlayerPosition().y
         );
+        this.player.setHealth(5);
 
         initializeEntities(atlas);
     }
