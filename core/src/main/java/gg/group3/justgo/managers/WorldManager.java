@@ -1,5 +1,6 @@
 package gg.group3.justgo.managers;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
@@ -15,9 +16,11 @@ public class WorldManager {
     private Array<Entity> doors;
     private Array<Entity> enemies;
     private final WorldEventListener listener;
+    private final VisibilityManager visibilityManager;
 
     public WorldManager(String levelPath, Texture atlas, WorldEventListener listener) {
         this.level = new GameLevel(levelPath);
+        this.visibilityManager = new VisibilityManager(level.getWidth(), level.getHeight());
         this.listener = listener;
         this.doors = new Array<>();
         this.enemies = new Array<>();
@@ -28,6 +31,9 @@ public class WorldManager {
             level.getPlayerPosition().y
         );
         this.player.setHealth(5);
+
+        // Perform initial calculation so the player isn't in the dark at start
+        this.visibilityManager.update(level.getPlayerPosition(), level);
 
         initializeEntities(atlas);
     }
@@ -66,6 +72,7 @@ public class WorldManager {
 
         // 2. If player successfully moved (spent a turn), update enemies
         if (playerMoved) {
+            visibilityManager.update(player.getPos(), level);
             updateEnemies(allCollidables);
         }
     }
@@ -91,6 +98,7 @@ public class WorldManager {
 
     public void dispose() {
         level.dispose();
+        visibilityManager.dispose();
     }
 
     // Getters for the Renderer
@@ -98,4 +106,5 @@ public class WorldManager {
     public Array<Entity> getEnemies() { return enemies; }
     public Array<Entity> getDoors() { return doors; }
     public GameLevel getLevel() { return level; }
+    public VisibilityManager getVisibilityManager() { return visibilityManager; }
 }

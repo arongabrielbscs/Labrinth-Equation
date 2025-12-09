@@ -107,6 +107,8 @@ public class GameScreen implements Screen {
 
         game.batch.end();
 
+        worldManager.getVisibilityManager().render(16, 16, game.viewport.getCamera());
+
         hud.update(worldManager.getPlayer().getHealth());
         hud.draw();
     }
