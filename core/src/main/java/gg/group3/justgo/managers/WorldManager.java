@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import gg.group3.justgo.GameLevel;
 import gg.group3.justgo.entities.Entity;
+import gg.group3.justgo.entities.SpikeEntity;
 import gg.group3.justgo.entities.utils.ArrayUtils;
 import gg.group3.justgo.math.Vector2Int;
 import gg.group3.justgo.utils.MathGen;
@@ -15,6 +16,7 @@ public class WorldManager {
     private final Entity player;
     private Array<Entity> doors;
     private Array<Entity> enemies;
+    private Array<SpikeEntity> spikes;
     private final WorldEventListener listener;
     private final VisibilityManager visibilityManager;
 
@@ -24,6 +26,7 @@ public class WorldManager {
         this.listener = listener;
         this.doors = new Array<>();
         this.enemies = new Array<>();
+        this.spikes = new Array<>();
 
         this.player = new Entity(
             new TextureRegion(atlas, 0, 0, 16, 16),
@@ -67,6 +70,11 @@ public class WorldManager {
                 })
             );
         }
+
+        // INITIALIZE SPIKES
+        for (Vector2Int pos : level.getSpikePositions()) {
+            spikes.add(new SpikeEntity(atlas, pos.x, pos.y));
+        }
     }
 
     // THE CORE TURN LOGIC
@@ -76,11 +84,33 @@ public class WorldManager {
         // 1. Attempt Player Move
         boolean playerMoved = player.move(dirX, dirY, level, allCollidables);
 
+
+        // 3. UPDATE SPIKES (Cycle: Off -> Priming -> Active)
+        for (SpikeEntity spike : spikes) {
+            spike.advanceState();
+        }
+        checkForSpikeTrap();
+
         // 2. If player successfully moved (spent a turn), update enemies
         if (playerMoved) {
             visibilityManager.update(player.getPos(), level, doors);
+
             allCollidables.add(player);
             updateEnemies(allCollidables);
+        }
+    }
+
+    private void checkForSpikeTrap() {
+        for (SpikeEntity spike : spikes) {
+            // Check if player is on the same tile AND spike is active
+            if (spike.getPos().equals(player.getPos()) && spike.isActive()) {
+                // Trigger the Question Screen!
+                listener.onQuestionTriggered(spike, spike.getTrapProblem());
+
+                // Optional: If you want the spike to turn off immediately after triggering:
+                // spike.resetState();
+                return; // Trigger only one trap at a time
+            }
         }
     }
 
@@ -111,6 +141,7 @@ public class WorldManager {
     public Entity getPlayer() { return player; }
     public Array<Entity> getEnemies() { return enemies; }
     public Array<Entity> getDoors() { return doors; }
+    public Array<SpikeEntity> getSpikes() { return spikes; }
     public GameLevel getLevel() { return level; }
     public VisibilityManager getVisibilityManager() { return visibilityManager; }
 }

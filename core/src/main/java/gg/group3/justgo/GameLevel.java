@@ -14,6 +14,7 @@ public class GameLevel {
     private final boolean[][] collidables;
     private Vector2Int playerPosition;
     private final Array<Vector2Int> doorPositions;
+    private final Array<Vector2Int> spikePositions;
     private final Array<EnemyData> enemies;
     private final TiledMap rawLevel;
     private final int width, height;
@@ -52,6 +53,7 @@ public class GameLevel {
         // Initialize the Entities
         MapLayer entityLayer = rawLevel.getLayers().get("Entities");
         doorPositions = new Array<>();
+        spikePositions = new Array<>();
         enemies = new Array<>();
         for (MapObject obj : entityLayer.getObjects()) {
             float x = obj.getProperties().get("x", float.class);
@@ -66,6 +68,9 @@ public class GameLevel {
                     break;
                 case "Door":
                     doorPositions.add(position);
+                    break;
+                case "Spike":
+                    spikePositions.add(position);
                     break;
                 case "Beanling":
                     enemies.add(new EnemyData(position, EnemyType.Beanling));
@@ -130,6 +135,10 @@ public class GameLevel {
 
     public Array<Vector2Int> getDoorPositions() {
         return doorPositions;
+    }
+
+    public Array<Vector2Int> getSpikePositions() {
+        return spikePositions;
     }
 
     public Array<EnemyData> getEnemies() {

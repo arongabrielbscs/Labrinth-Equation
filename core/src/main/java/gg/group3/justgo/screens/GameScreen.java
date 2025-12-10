@@ -138,6 +138,9 @@ public class GameScreen implements Screen {
         game.batch.begin();
 
         tiledMapRenderer.render();
+        for (Entity spike : worldManager.getSpikes()) {
+            spike.draw(game.batch);
+        }
         worldManager.getPlayer().draw(game.batch);
         for (Entity door : worldManager.getDoors()) {
             if (door.getHealth() <= 0) continue;
