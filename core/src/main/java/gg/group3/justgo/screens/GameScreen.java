@@ -52,7 +52,12 @@ public class GameScreen implements Screen {
             @Override
             public void onQuestionTriggered(Entity target, MathGen problem) {
                 // The Manager says a collision happened -> The Screen shows the UI
-                questionScreen.setQuestion(problem.getQuestion(), problem.getAnswer(), target);
+                questionScreen.setQuestion(
+                    problem.getQuestion(),
+                    problem.getAnswer(),
+                    problem.getOptions(), // <--- Pass the generated options
+                    target
+                );
                 questionScreen.show();
             }
 
@@ -121,12 +126,9 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         draw();
-        if (!questionScreen.isVisible()) {
-            update(delta);
-        } else {
-            questionScreen.draw();
-            questionScreen.act();
-        }
+        update(delta);
+        questionScreen.draw();
+        questionScreen.act();
     }
 
     @Override
