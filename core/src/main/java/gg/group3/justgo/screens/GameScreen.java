@@ -29,24 +29,47 @@ public class GameScreen implements Screen {
 
     public GameScreen(JustGo game) {
         this.game = game;
+
+        TextureRegion heartRegion = new TextureRegion(game.atlas, 0, 144, 16, 16);
         questionScreen = new QuestionScreen(new QuestionScreen.Answered() {
             @Override
-            public void onCorrect(Entity whoQuestionedThePlayer) {
-                // TODO Maybe make sure that we remove it on where we actually put it, instead of... this
-                whoQuestionedThePlayer.damage(1);
+            public void onCorrect(Entity enemy) {
+                // 1. Damage the Enemy
+                enemy.damage(1);
+
+                // 2. Check if Battle is Over
+                if (enemy.getHealth() <= 0) {
+                    // VICTORY!
+                    questionScreen.hide();
+                    // Optional: Play a sound or show a "Defeated" message
+                } else {
+                    // NEXT ROUND: Generate a new question
+                    continueBattle(enemy);
+                }
             }
 
             @Override
-            public void onWrong(Entity whoQuestionedThePlayer) {
-                whoQuestionedThePlayer.heal(1);
+            public void onWrong(Entity enemy) {
+                // 1. Punish Player / Heal Enemy
+                enemy.heal(1);
                 worldManager.getPlayer().damage(1);
-                Gdx.app.log("Question Screen", "Wrong Answer!!!");
+
+                // 2. Check if Player is Dead
+                if (worldManager.getPlayer().getHealth() <= 0) {
+                    // DEFEAT!
+                    questionScreen.hide();
+                    // TODO: Trigger real Game Over screen
+                    Gdx.app.log("Game", "GAME OVER");
+                } else {
+                    // NEXT ROUND: Generate a new question
+                    continueBattle(enemy);
+                }
             }
 
             @Override
             public void onCancel() {
             }
-        });
+        }, heartRegion);
 
         worldManager = new WorldManager("levels/testlevel.tmx", game.atlas, new WorldEventListener() {
             @Override
@@ -56,7 +79,8 @@ public class GameScreen implements Screen {
                     problem.getQuestion(),
                     problem.getAnswer(),
                     problem.getOptions(), // <--- Pass the generated options
-                    target
+                    target,
+                    worldManager.getPlayer().getHealth()
                 );
                 questionScreen.show();
             }
@@ -69,8 +93,22 @@ public class GameScreen implements Screen {
 
         tiledMapRenderer = new OrthogonalTiledMapRenderer(worldManager.getLevel().getRawLevel());
 
-        TextureRegion heartRegion = new TextureRegion(game.atlas, 0, 144, 16, 16);
         hud = new HUD(game.batch, heartRegion);
+    }
+
+    // Helper method to keep code clean
+    private void continueBattle(Entity enemy) {
+        // Generate a new math problem (Difficulty 30)
+        MathGen nextProblem = MathGen.generateBasicArithmetic(8);
+
+        // Refresh the UI with: New Question, New Options, Updated Hearts
+        questionScreen.setQuestion(
+            nextProblem.getQuestion(),
+            nextProblem.getAnswer(),
+            nextProblem.getOptions(),
+            enemy,
+            worldManager.getPlayer().getHealth() // Pass updated player HP
+        );
     }
 
     private void update(float dt) {
