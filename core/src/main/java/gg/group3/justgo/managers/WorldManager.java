@@ -57,7 +57,9 @@ public class WorldManager {
 
         // Initialize Enemies with collision logic
         for (GameLevel.EnemyData enemyData : level.getEnemies()) {
-            TextureRegion region = new TextureRegion(atlas, 3 * 16, 16, 16, 16);
+            int atlX = enemyData.type.atlasX;
+            int atlY = enemyData.type.atlasY;
+            TextureRegion region = new TextureRegion(atlas, atlX * 16, atlY * 16, 16, 16);
             enemies.add(new Entity(region, enemyData.position.x, enemyData.position.y)
                 .withCollisionCallback((parent, other) -> {
                     MathGen problem = MathGen.generateBasicArithmetic(30);

@@ -19,8 +19,20 @@ public class GameLevel {
     private final int width, height;
 
     public enum EnemyType {
-        Beanling,
-        Beanite,
+        Beanling(3, 1, 1),
+        Beanite(2, 1, 2);
+
+        // Fields to store the data
+        public final int atlasX;
+        public final int atlasY;
+        public final int maxHp;
+
+        // Constructor for the Enum
+        EnemyType(int x, int y, int hp) {
+            this.atlasX = x;
+            this.atlasY = y;
+            this.maxHp = hp;
+        }
     }
 
     public static class EnemyData {
@@ -57,6 +69,9 @@ public class GameLevel {
                     break;
                 case "Beanling":
                     enemies.add(new EnemyData(position, EnemyType.Beanling));
+                    break;
+                case "Beanite":
+                    enemies.add(new EnemyData(position, EnemyType.Beanite));
                     break;
             }
         }
