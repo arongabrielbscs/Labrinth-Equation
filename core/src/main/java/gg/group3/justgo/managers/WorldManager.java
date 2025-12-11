@@ -68,6 +68,7 @@ public class WorldManager {
                     MathGen problem = MathGen.generateBasicArithmetic(30);
                     listener.onQuestionTriggered(parent, problem);
                 })
+                .asEnemy(enemyData.type)
             );
         }
 

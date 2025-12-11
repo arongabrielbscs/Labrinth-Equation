@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gg.group3.justgo.entities.Entity;
+import gg.group3.justgo.entities.SpikeEntity;
 
 public class QuestionScreen extends Stage {
     // ... Interface definition remains the same ...
@@ -116,6 +117,13 @@ public class QuestionScreen extends Stage {
         this.correctAnswer = answer;
         this.whoQuestionedThePlayer = target;
 
+        if (target instanceof SpikeEntity) {
+            enemyNameLabel.setText("Get Spiked!");
+        } else if (target.isEnemy()) {
+            enemyNameLabel.setText("Battle!");
+        } else {
+            enemyNameLabel.setText("Door!");
+        }
         questionLabel.setText(question);
 
         // Update Enemy Portrait

@@ -26,6 +26,8 @@ public class Entity extends Sprite {
     private float wiggleElapsed = 0f;
     private final Vector2Int wiggleStart;
     private final Vector2Int wiggleTarget;
+    private GameLevel.EnemyType enemyType = null;
+
     private static final float WIGGLE_TIME = 0.15f;
     private static final float WIGGLE_DISTANCE = 0.3f;
 
@@ -386,6 +388,11 @@ public class Entity extends Sprite {
         return this;
     }
 
+    public Entity asEnemy(GameLevel.EnemyType enemyType) {
+        this.enemyType = enemyType;
+        return this;
+    }
+
     public Entity health(int health) {
         this.health = health;
         return this;
@@ -405,6 +412,10 @@ public class Entity extends Sprite {
 
     public int getHealth() {
         return health;
+    }
+
+    public boolean isEnemy() {
+        return enemyType != null;
     }
 }
 
