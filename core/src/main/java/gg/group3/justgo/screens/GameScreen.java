@@ -55,26 +55,6 @@ public class GameScreen implements Screen {
             public void onCancel() { }
         }, heartRegion);
 
-//        worldManager = new WorldManager("levels/testlevel.tmx", game.atlas, new WorldEventListener() {
-//            @Override
-//            public void onQuestionTriggered(Entity target, MathGen problem) {
-//                if (target.isBoss()) {
-//                    questionsQueue = 3;
-//                } else {
-//                    questionsQueue = 1;
-//                }
-//
-//                showQuestionUI(target, problem);
-//            }
-//
-//            @Override
-//            public void onGameOver() {
-//                // Handle Game over logic
-//            }
-//        });
-//
-//        tiledMapRenderer = new OrthogonalTiledMapRenderer(worldManager.getLevel().getRawLevel());
-
         hud = new HUD(game.batch, heartRegion);
         loadLevel(currentLevelIndex);
     }
