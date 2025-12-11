@@ -21,7 +21,9 @@ public class GameLevel {
 
     public enum EnemyType {
         Beanling(3, 1, 1),
-        Beanite(2, 1, 2);
+        Beanite(2, 1, 2),
+        RatFly(0, 1, 3),
+        RatGhoul(1, 1, 5);
 
         // Fields to store the data
         public final int atlasX;
