@@ -57,7 +57,7 @@ public class Entity extends Sprite {
     public boolean move(int dx, int dy, GameLevel level, Array<Entity> collidables) {
         if (dx == 0 && dy == 0) return false;
 
-        // If we're already moving, snap to current target and start new movement
+        // Snap to grid if not moving
         if (!pos.equals(targetPos)) {
             pos.set(targetPos);
             isWiggling = false;
@@ -65,29 +65,70 @@ public class Entity extends Sprite {
 
         Vector2Int newTargetPos = targetPos.cpy().add(dx, dy);
 
-        if (level.isCollidable(newTargetPos.x, newTargetPos.y)) {
-            startWiggle(dx, dy);
-            return false;
+        // 1. WALL COLLISION (Check every tile this entity would occupy)
+        // If I am a 4x4 Boss, I need to check all 16 tiles I'm stepping onto, not just the top-left.
+        int myW = getTileWidth();
+        int myH = getTileHeight();
+
+        for (int ox = 0; ox < myW; ox++) {
+            for (int oy = 0; oy < myH; oy++) {
+                if (level.isCollidable(newTargetPos.x + ox, newTargetPos.y + oy)) {
+                    startWiggle(dx, dy);
+                    return false; // Hit a wall
+                }
+            }
         }
 
+        // 2. ENTITY COLLISION (AABB Intersection)
         for (Entity e : collidables) {
             if (e.getHealth() <= 0) continue;
             if (e == this) continue;
-            if (e.getPos().equals(newTargetPos) || e.getTargetPos().equals(newTargetPos)) {
+
+            // Get the OTHER entity's bounds
+            // We use e.getTargetPos() to collide with where they are GOING,
+            // otherwise we might walk through them if we move on the same turn.
+            int otherX = e.getTargetPos().x;
+            int otherY = e.getTargetPos().y;
+            int otherW = e.getTileWidth();
+            int otherH = e.getTileHeight();
+
+            // My bounds at the new position
+            int myX = newTargetPos.x;
+            int myY = newTargetPos.y;
+
+            // CHECK INTERSECTION (AABB)
+            // Logic: If (My Left < Other Right) AND (My Right > Other Left) ...
+            if (myX < otherX + otherW && myX + myW > otherX &&
+                myY < otherY + otherH && myY + myH > otherY) {
+
+                // COLLISION DETECTED!
                 startWiggle(dx, dy);
-                if (e.collisionCallback != null) e.collisionCallback.collided(e,this);
+
+                // Trigger the callback (This starts the Math Question)
+                if (e.collisionCallback != null) {
+                    e.collisionCallback.collided(e, this);
+                }
+
                 return false;
             }
         }
 
+        // 3. Movement Allowed
         targetPos.set(newTargetPos);
-
-        // Reset interpolation
         transitionElapsed = 0f;
         if (dx != 0) {
             setFlip(dx <= 0, false);
         }
         return true;
+    }
+
+    // Helper to get width in TILES (e.g., Boss = 4, Player = 1)
+    public int getTileWidth() {
+        return (int) (getWidth() / 16);
+    }
+
+    public int getTileHeight() {
+        return (int) (getHeight() / 16);
     }
 
     /**
