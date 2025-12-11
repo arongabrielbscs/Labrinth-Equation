@@ -16,4 +16,14 @@
    <property name="collidable" type="bool" value="true"/>
   </properties>
  </tile>
+ <tile id="50">
+  <properties>
+   <property name="collidable" type="bool" value="false"/>
+  </properties>
+ </tile>
+ <tile id="51">
+  <properties>
+   <property name="collidable" type="bool" value="true"/>
+  </properties>
+ </tile>
 </tileset>
