@@ -25,7 +25,8 @@ public class GameLevel {
         Beanite(2, 1, 2, 2),
         RatFly(0, 1, 3, 2),
         RatGhoul(1, 1, 5, 3),
-        GhoulKing(12, 0, 64, 15, 5)
+        GhoulKing(12, 0, 64, 15, 5),
+        WillowQueen(12, 4, 64, 16)
         ;
 
         // Fields to store the data
@@ -105,6 +106,8 @@ public class GameLevel {
                     case "GhoulKing":
                         bossData = new EnemyData(position, EnemyType.GhoulKing);
                         break;
+                    case "WillowQueen":
+                        bossData = new EnemyData(position, EnemyType.WillowQueen);
                 }
             }
         }
