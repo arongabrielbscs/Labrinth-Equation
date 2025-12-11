@@ -1,7 +1,8 @@
 package gg.group3.justgo.utils;
 
-import com.badlogic.gdx.utils.Array;
 import java.util.Random;
+
+import com.badlogic.gdx.utils.Array;
 
 public class MathGen {
     private final String question;
@@ -78,6 +79,67 @@ public class MathGen {
         options.shuffle();
 
         return new MathGen(String.valueOf(result), question, options);
+    }
+
+    public static MathGen generateFindX(int maxNum) {
+    int operation = random.nextInt(4);
+    String question;
+    int x; // The value of X (correct answer)
+    int num1, num2;
+    
+    switch (operation) {
+        case 0: // X + a = b  →  X = b - a
+            num1 = random.nextInt(maxNum) + 1;
+            num2 = random.nextInt(maxNum) + 1;
+            x = num2;
+            int sum = num1 + num2;
+            question = "X + " + num1 + " = " + sum;
+            break;
+            
+        case 1: // X - a = b  →  X = a + b
+            num1 = random.nextInt(maxNum) + 1;
+            num2 = random.nextInt(maxNum) + 1;
+            x = num1 + num2;
+            question = "X - " + num1 + " = " + num2;
+            break;
+            
+        case 2: // a * X = b  →  X = b / a
+            num1 = random.nextInt(maxNum) + 1;
+            x = random.nextInt(maxNum) + 1;
+            int product = num1 * x;
+            question = num1 + " * X = " + product;
+            break;
+            
+        case 3: // X / a = b  →  X = a * b
+            num1 = random.nextInt(maxNum) + 1;
+            num2 = random.nextInt(maxNum) + 1;
+            x = num1 * num2;
+            question = "X / " + num1 + " = " + num2;
+            break;
+            
+        default:
+            x = 5;
+            question = "X + 3 = 8";
+    }
+    
+    // --- Generate Distractors (Wrong Answers) ---
+    Array<String> options = new Array<>();
+    options.add(String.valueOf(x)); // Add correct answer first
+    
+    while (options.size < 4) {
+        int offset = random.nextInt(10) - 5;
+        if (offset == 0) offset = 1;
+        int wrongAnswer = x + offset;
+        if (wrongAnswer < 1) wrongAnswer = 1;
+        
+        String wrongStr = String.valueOf(wrongAnswer);
+        if (!options.contains(wrongStr, false)) {
+            options.add(wrongStr);
+        }
+    }
+    
+    options.shuffle();
+    return new MathGen(String.valueOf(x), question, options);
     }
 
     public String getAnswer() { return answer; }
