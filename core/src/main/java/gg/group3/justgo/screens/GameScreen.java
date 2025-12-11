@@ -112,6 +112,8 @@ public class GameScreen implements Screen {
     }
 
     private void update(float dt) {
+        if (questionScreen.isVisible())
+            return;
         // 1. Input Handling
         int dirX = 0, dirY = 0;
         if (InputUtils.isKeysJustPressed(Input.Keys.A, Input.Keys.LEFT)) dirX -= 1;

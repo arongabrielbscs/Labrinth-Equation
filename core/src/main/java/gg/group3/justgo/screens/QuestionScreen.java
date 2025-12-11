@@ -166,6 +166,10 @@ public class QuestionScreen extends Stage {
         }
     }
 
+    public boolean isVisible() {
+        return isVisible;
+    }
+
     @Override
     public void draw() {
         if (!isVisible) return;
