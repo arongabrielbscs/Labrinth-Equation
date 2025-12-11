@@ -3,7 +3,7 @@ i:atlas.png:atlas-22e9cbe1e3a6d73412312e7529052877.png:1231:image/png:1
 d:tilesets:tilesets:0:application/unknown:1
 b:tilesets/atlas.tsx:tilesets/atlas-56755342335faf62982479f5ae451226.tsx:577:application/unknown:1
 b:atlas.aseprite:atlas-8bba2485796a0425cb5a32ba938071ce.aseprite:3348:application/unknown:1
-t:assets.txt:assets-f5fc966ec27c931a29e9d11193c659ca.txt:368:text/plain:1
+t:assets.txt:assets-befa42ecc192dd6ed73f036bf9e59598.txt:404:text/plain:1
 d:images:images:0:application/unknown:1
 i:images/atlas.png:images/atlas-32cfbbb7df8939d8c9b095bbee228611.png:4180:image/png:1
 i:images/libgdx.png:images/libgdx-6ce2ac53bc1738a1e5ac95f05dceb4a5.png:2456:image/png:1
@@ -22,7 +22,9 @@ b:fonts/Roboto-Bold.ttf:fonts/Roboto-Bold-dd5415b95e675853c6ccdceba7324ce7.ttf:1
 i:fonts/ui-font.png:fonts/ui-font-603a4dd4b664a520484a656268c71899.png:23728:image/png:1
 t:fonts/question-font.fnt:fonts/question-font-e0d6f6c81643a078eb6d603f7bb7e1fe.fnt:23051:application/unknown:1
 d:levels:levels:0:application/unknown:1
-b:levels/testlevel.tmx:levels/testlevel-95349f75dc9459446c834c5b78556a5c.tmx:4246:application/unknown:1
+b:levels/level3.tmx:levels/level3-88d57154d924b80f174a68ae0c6d3ca6.tmx:11996:application/unknown:1
+b:levels/level2.tmx:levels/level2-a9f054211a69f239950e6e7ecd14ead2.tmx:25285:application/unknown:1
+b:levels/testlevel.tmx:levels/testlevel-dea8a1a698250ff4945d3a1d4fc77656.tmx:6208:application/unknown:1
 t:com/badlogic/gdx/graphics/g3d/particles/particles.fragment.glsl:particles.fragment-b90524761fdf09b0a836056d590c30b8.glsl:820:application/unknown:1
 t:com/badlogic/gdx/graphics/g3d/particles/particles.vertex.glsl:particles.vertex-f25b8b2fae10b9bfa09bfdd484923148.glsl:2886:application/unknown:1
 t:com/badlogic/gdx/graphics/g3d/shaders/default.fragment.glsl:default.fragment-e1c018bd48044c8b67c7bbc53145e540.glsl:5874:application/unknown:1
