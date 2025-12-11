@@ -91,6 +91,7 @@ public class WorldManager {
                     MathGen problem = MathGen.getForLevel(currentLevelIndex, isBoss);
                     listener.onQuestionTriggered(parent, problem);
                 })
+                .health(enemyData.type.maxHp)
                 .asEnemy(enemyData.type)
             );
         }
