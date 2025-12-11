@@ -11,9 +11,9 @@ fonts/ui-font.fnt
 fonts/ui-font.png
 images/atlas.png
 images/libgdx.png
+levels/level1.tmx
 levels/level2.tmx
 levels/level3.tmx
-levels/testlevel.tmx
 tilesets/atlas.tsx
 ui/question-screen.atlas
 ui/question-screen.png
