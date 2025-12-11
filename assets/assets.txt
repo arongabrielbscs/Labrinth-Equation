@@ -2,7 +2,7 @@ d:assets:assets:0:application/unknown:1
 i:atlas.png:atlas-22e9cbe1e3a6d73412312e7529052877.png:1231:image/png:1
 d:tilesets:tilesets:0:application/unknown:1
 b:tilesets/atlas.tsx:tilesets/atlas-975cc19c0c0bc369d765fd865819e92c.tsx:806:application/unknown:1
-b:atlas.aseprite:atlas-b9a319d2015d4b14d599f8797acb85a5.aseprite:3546:application/unknown:1
+b:atlas.aseprite:atlas-2887209570fcc44c23762279c938d227.aseprite:4310:application/unknown:1
 t:assets.txt:assets-befa42ecc192dd6ed73f036bf9e59598.txt:404:text/plain:1
 d:images:images:0:application/unknown:1
 i:images/atlas.png:images/atlas-941a1eb1549978826ac1df3c17c5a414.png:4448:image/png:1
