@@ -82,6 +82,12 @@ public class GameLevel {
                 case "Beanite":
                     enemies.add(new EnemyData(position, EnemyType.Beanite));
                     break;
+                case "RatFly":
+                    enemies.add(new EnemyData(position, EnemyType.RatFly));
+                    break;
+                case "RatGhoul":
+                    enemies.add(new EnemyData(position, EnemyType.RatGhoul));
+                    break;
             }
         }
 
