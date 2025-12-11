@@ -20,21 +20,23 @@ public class GameLevel {
     private final int width, height;
 
     public enum EnemyType {
-        Beanling(3, 1, 1),
-        Beanite(2, 1, 2),
-        RatFly(0, 1, 3),
-        RatGhoul(1, 1, 5);
+        Beanling(3, 1, 1, 1),
+        Beanite(2, 1, 2, 2),
+        RatFly(0, 1, 3, 2),
+        RatGhoul(1, 1, 5, 3);
 
         // Fields to store the data
         public final int atlasX;
         public final int atlasY;
         public final int maxHp;
+        public final int damage;
 
         // Constructor for the Enum
-        EnemyType(int x, int y, int hp) {
+        EnemyType(int x, int y, int hp, int damage) {
             this.atlasX = x;
             this.atlasY = y;
             this.maxHp = hp;
+            this.damage = damage;
         }
     }
 

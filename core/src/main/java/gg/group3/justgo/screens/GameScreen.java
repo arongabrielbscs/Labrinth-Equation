@@ -52,7 +52,9 @@ public class GameScreen implements Screen {
             public void onWrong(Entity enemy) {
                 // 1. Punish Player / Heal Enemy
                 enemy.heal(1);
-                worldManager.getPlayer().damage(1);
+                if (enemy.isEnemy()) {
+                    worldManager.getPlayer().damage(enemy.getEnemyType().damage);
+                }
 
                 // 2. Check if Player is Dead
                 if (worldManager.getPlayer().getHealth() <= 0) {
