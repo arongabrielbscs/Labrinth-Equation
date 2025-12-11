@@ -6,15 +6,11 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-import gg.group3.justgo.GameLevel;
 import gg.group3.justgo.JustGo;
 import gg.group3.justgo.entities.Entity;
-import gg.group3.justgo.entities.utils.ArrayUtils;
 import gg.group3.justgo.managers.WorldEventListener;
 import gg.group3.justgo.managers.WorldManager;
-import gg.group3.justgo.math.Vector2Int;
 import gg.group3.justgo.utils.InputUtils;
 import gg.group3.justgo.utils.MathGen;
 
@@ -27,6 +23,9 @@ public class GameScreen implements Screen {
 
     private final WorldManager worldManager;
 
+    // NEW: Counter for the boss battle
+    private int questionsQueue = 0;
+
     public GameScreen(JustGo game) {
         this.game = game;
 
@@ -34,57 +33,34 @@ public class GameScreen implements Screen {
         questionScreen = new QuestionScreen(new QuestionScreen.Answered() {
             @Override
             public void onCorrect(Entity enemy) {
-                // 1. Damage the Enemy
                 enemy.damage(1);
-
-                // 2. Check if Battle is Over
-                if (enemy.getHealth() <= 0) {
-                    // VICTORY!
-                    questionScreen.hide();
-                    // Optional: Play a sound or show a "Defeated" message
-                } else {
-                    // NEXT ROUND: Generate a new question
-                    continueBattle(enemy);
-                }
+                handleBattleFlow(enemy); // Use new helper
             }
 
             @Override
             public void onWrong(Entity enemy) {
-                // 1. Punish Player / Heal Enemy
                 enemy.heal(1);
-                if (enemy.isEnemy()) {
-                    worldManager.getPlayer().damage(enemy.getEnemyType().damage);
-                }
+                // Boss deals more damage?
+                int dmg = enemy.isBoss() ? 2 : 1;
+                worldManager.getPlayer().damage(dmg);
 
-                // 2. Check if Player is Dead
-                if (worldManager.getPlayer().getHealth() <= 0) {
-                    // DEFEAT!
-                    questionScreen.hide();
-                    // TODO: Trigger real Game Over screen
-                    Gdx.app.log("Game", "GAME OVER");
-                } else {
-                    // NEXT ROUND: Generate a new question
-                    continueBattle(enemy);
-                }
+                handleBattleFlow(enemy); // Use new helper
             }
 
             @Override
-            public void onCancel() {
-            }
+            public void onCancel() { }
         }, heartRegion);
 
         worldManager = new WorldManager("levels/testlevel.tmx", game.atlas, new WorldEventListener() {
             @Override
             public void onQuestionTriggered(Entity target, MathGen problem) {
-                // The Manager says a collision happened -> The Screen shows the UI
-                questionScreen.setQuestion(
-                    problem.getQuestion(),
-                    problem.getAnswer(),
-                    problem.getOptions(), // <--- Pass the generated options
-                    target,
-                    worldManager.getPlayer().getHealth()
-                );
-                questionScreen.show();
+                if (target.isBoss()) {
+                    questionsQueue = 3;
+                } else {
+                    questionsQueue = 1;
+                }
+
+                showQuestionUI(target, problem);
             }
 
             @Override
@@ -96,6 +72,18 @@ public class GameScreen implements Screen {
         tiledMapRenderer = new OrthogonalTiledMapRenderer(worldManager.getLevel().getRawLevel());
 
         hud = new HUD(game.batch, heartRegion);
+    }
+
+    private void showQuestionUI(Entity target, MathGen problem) {
+        // The Manager says a collision happened -> The Screen shows the UI
+        questionScreen.setQuestion(
+            problem.getQuestion(),
+            problem.getAnswer(),
+            problem.getOptions(), // <--- Pass the generated options
+            target,
+            worldManager.getPlayer().getHealth()
+        );
+        questionScreen.show();
     }
 
     // Helper method to keep code clean
@@ -111,6 +99,35 @@ public class GameScreen implements Screen {
             enemy,
             worldManager.getPlayer().getHealth() // Pass updated player HP
         );
+    }
+
+    // NEW: Centralized Battle Flow
+    private void handleBattleFlow(Entity enemy) {
+        questionsQueue--; // Decrement the queue
+
+        // 1. Check if Battle Ended (Someone died)
+        if (enemy.getHealth() <= 0 || worldManager.getPlayer().getHealth() <= 0) {
+            questionScreen.hide();
+            questionsQueue = 0;
+
+            if (enemy.getHealth() <= 0 && enemy.isBoss()) {
+                Gdx.app.log("Game", "BOSS DEFEATED!");
+            }
+            return;
+        }
+
+        // 2. Check if we have more questions queued
+        if (questionsQueue > 0) {
+            // Generate next question immediately!
+            // Boss gets harder math (100), Normal gets easy (10)
+            int difficulty = enemy.isBoss() ? 100 : 10;
+            MathGen nextProblem = MathGen.generateBasicArithmetic(difficulty);
+
+            showQuestionUI(enemy, nextProblem);
+        } else {
+            // Queue empty, close screen
+            questionScreen.hide();
+        }
     }
 
     private void update(float dt) {
@@ -145,6 +162,7 @@ public class GameScreen implements Screen {
         for (Entity spike : worldManager.getSpikes()) {
             spike.draw(game.batch);
         }
+        worldManager.getBoss().draw(game.batch);
         worldManager.getPlayer().draw(game.batch);
         for (Entity door : worldManager.getDoors()) {
             if (door.getHealth() <= 0) continue;

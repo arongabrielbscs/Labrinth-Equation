@@ -13,10 +13,11 @@ import gg.group3.justgo.math.Vector2Int;
 public class GameLevel {
     private final boolean[][] collidables;
     private Vector2Int playerPosition;
+    private EnemyData bossData;
+    private final TiledMap rawLevel;
     private final Array<Vector2Int> doorPositions;
     private final Array<Vector2Int> spikePositions;
     private final Array<EnemyData> enemies;
-    private final TiledMap rawLevel;
     private final int width, height;
 
     public enum EnemyType {
@@ -75,32 +76,36 @@ public class GameLevel {
         for (MapObject obj : entityLayer.getObjects()) {
             float x = obj.getProperties().get("x", float.class);
             float y = obj.getProperties().get("y", float.class);
-            float w = obj.getProperties().get("width", float.class);
-            float h = obj.getProperties().get("height", float.class);
 
-            final Vector2Int position = new Vector2Int((int)(x/w), (int)(y/h));
-            switch (obj.getName()) {
-                case "Player":
-                    playerPosition = position;
-                    break;
-                case "Door":
-                    doorPositions.add(position);
-                    break;
-                case "Spike":
-                    spikePositions.add(position);
-                    break;
-                case "Beanling":
-                    enemies.add(new EnemyData(position, EnemyType.Beanling));
-                    break;
-                case "Beanite":
-                    enemies.add(new EnemyData(position, EnemyType.Beanite));
-                    break;
-                case "RatFly":
-                    enemies.add(new EnemyData(position, EnemyType.RatFly));
-                    break;
-                case "RatGhoul":
-                    enemies.add(new EnemyData(position, EnemyType.RatGhoul));
-                    break;
+            Vector2Int position = new Vector2Int((int)(x / 16), (int)(y / 16));
+
+            if (obj.getName() != null) {
+                switch (obj.getName()) {
+                    case "Player":
+                        playerPosition = position;
+                        break;
+                    case "Door":
+                        doorPositions.add(position);
+                        break;
+                    case "Spike":
+                        spikePositions.add(position);
+                        break;
+                    case "Beanling":
+                        enemies.add(new EnemyData(position, EnemyType.Beanling));
+                        break;
+                    case "Beanite":
+                        enemies.add(new EnemyData(position, EnemyType.Beanite));
+                        break;
+                    case "RatFly":
+                        enemies.add(new EnemyData(position, EnemyType.RatFly));
+                        break;
+                    case "RatGhoul":
+                        enemies.add(new EnemyData(position, EnemyType.RatGhoul));
+                        break;
+                    case "GhoulKing":
+                        bossData = new EnemyData(position, EnemyType.GhoulKing);
+                        break;
+                }
             }
         }
 
@@ -166,5 +171,9 @@ public class GameLevel {
 
     public Array<EnemyData> getEnemies() {
         return enemies;
+    }
+
+    public EnemyData getBossData() {
+        return bossData;
     }
 }

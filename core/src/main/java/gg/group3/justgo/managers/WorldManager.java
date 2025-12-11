@@ -16,6 +16,7 @@ public class WorldManager {
     private final Entity player;
     private Array<Entity> doors;
     private Array<Entity> enemies;
+    private Entity boss;
     private Array<SpikeEntity> spikes;
     private final WorldEventListener listener;
     private final VisibilityManager visibilityManager;
@@ -36,8 +37,26 @@ public class WorldManager {
             // Generate problem and notify the listener (UI)
             MathGen problem = MathGen.generateBasicArithmetic(10);
             listener.onQuestionTriggered(other, problem);
-        });
-        this.player.setHealth(5);
+        })
+        .health(5);
+
+        if (level.getBossData() != null) {
+            GameLevel.EnemyData data = level.getBossData();
+            int atlX = data.type.atlasX;
+            int atlY = data.type.atlasY;
+            int size = data.type.size;
+            this.boss = new Entity(
+                new TextureRegion(atlas, atlX * 16, atlY * 16, size, size),
+                data.position.x,
+                data.position.y
+            ).withCollisionCallback((parent, other) -> {
+                // Generate problem and notify the listener (UI)
+                MathGen problem = MathGen.generateBasicArithmetic(10);
+                listener.onQuestionTriggered(other, problem);
+            })
+            .health(data.type.maxHp)
+            .asEnemy(data.type, true);
+        }
 
         initializeEntities(atlas);
 
@@ -81,6 +100,9 @@ public class WorldManager {
     // THE CORE TURN LOGIC
     public void processTurn(int dirX, int dirY) {
         Array<Entity> allCollidables = ArrayUtils.combineArrays(doors, enemies);
+        if (boss != null && boss.getHealth() > 0) {
+            allCollidables.add(boss); // Add Boss to collisions
+        }
 
         // 1. Attempt Player Move
         boolean playerMoved = player.move(dirX, dirY, level, allCollidables);
@@ -98,6 +120,7 @@ public class WorldManager {
 
             allCollidables.add(player);
             updateEnemies(allCollidables);
+            updateBoss(allCollidables);
         }
     }
 
@@ -126,9 +149,25 @@ public class WorldManager {
         }
     }
 
+    private void updateBoss(Array<Entity> allCollidables) {
+        if (boss == null || boss.getHealth() <= 0) return;
+
+        // 1. Check Priming Logic
+        // If this returns false, the boss is "charging" and skips movement
+        if (!boss.processBossTurn()) {
+            return;
+        }
+
+        // 2. Move (The boss is huge, but moveTowards handles the center position)
+        if (boss.isVisibleTo(player, level, doors)) {
+            boss.moveTowards(player, level, allCollidables, 4);
+        }
+    }
+
     // Updates animations (interpolations)
     public void update(float dt) {
         player.update(dt);
+        if (boss != null) boss.update(dt);
         for (Entity enemy : enemies) enemy.update(dt);
         for (Entity door : doors) door.update(dt);
     }
@@ -140,6 +179,7 @@ public class WorldManager {
 
     // Getters for the Renderer
     public Entity getPlayer() { return player; }
+    public Entity getBoss() { return boss; }
     public Array<Entity> getEnemies() { return enemies; }
     public Array<Entity> getDoors() { return doors; }
     public Array<SpikeEntity> getSpikes() { return spikes; }

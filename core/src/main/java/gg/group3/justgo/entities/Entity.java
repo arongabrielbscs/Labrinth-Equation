@@ -1,5 +1,6 @@
 package gg.group3.justgo.entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
@@ -31,13 +32,18 @@ public class Entity extends Sprite {
     private static final float WIGGLE_TIME = 0.15f;
     private static final float WIGGLE_DISTANCE = 0.3f;
 
+    // --- BOSS MECHANICS ---
+    private boolean isBoss = false;
+    private int primeCounter = 0;
+    private static final int TURNS_TO_PRIME = 5;
+
     public Entity(TextureRegion region, int posX, int posY) {
         super(region);
         this.pos = new Vector2Int(posX, posY);
         this.targetPos = new Vector2Int(posX, posY);
         this.wiggleStart = new Vector2Int();
         this.wiggleTarget = new Vector2Int();
-        setPosition(pos.x * getWidth(), pos.y * getHeight());
+        setPosition(pos.x * 16, pos.y * 16);
     }
 
     /**
@@ -179,53 +185,53 @@ public class Entity extends Sprite {
      * @param level       The game level for wall checks.
      * @param collidables All entities that can block the move.
      */
-    public void moveTowards(Entity target, GameLevel level, Array<Entity> collidables) {
-        if (this.equals(target)) return;
+    public void moveTowards(Entity target, GameLevel level, Array<Entity> collidables, int speed) {
+        // Loop for the number of steps allowed by speed
+        for (int i = 0; i < speed; i++) {
 
-        // Get the difference in position (delta)
-        int dx = target.getPosX() - this.getPosX();
-        int dy = target.getPosY() - this.getPosY();
+            // 1. Check if we already arrived
+            if (this.getPos().equals(target.getPos())) return;
 
-        // Determine the step magnitude (+1 or -1) for each axis
-        int stepX = Integer.compare(dx, 0);
-        int stepY = Integer.compare(dy, 0);
+            // 2. RE-CALCULATE logic relative to the current position (it changes every loop!)
+            int dx = target.getPosX() - this.getPosX();
+            int dy = target.getPosY() - this.getPosY();
+            int stepX = Integer.compare(dx, 0);
+            int stepY = Integer.compare(dy, 0);
+            int absDx = Math.abs(dx);
+            int absDy = Math.abs(dy);
 
-        // Get the absolute distance remaining on each axis
-        int absDx = Math.abs(dx);
-        int absDy = Math.abs(dy);
+            Vector2Int[] potentialMoves = new Vector2Int[2];
 
-        // Create an array of potential moves (up to 2: Horizontal, Vertical)
-        Vector2Int potentialMoves[] = new Vector2Int[2];
+            // Prioritize axis
+            if (absDx > absDy) {
+                potentialMoves[0] = new Vector2Int(stepX, 0);
+                potentialMoves[1] = new Vector2Int(0, stepY);
+            } else {
+                potentialMoves[0] = new Vector2Int(0, stepY);
+                potentialMoves[1] = new Vector2Int(stepX, 0);
+            }
 
-        // Prioritize the axis with the largest distance remaining (greedy approach)
-        if (absDx > absDy) {
-            // 1. Horizontal move (e.g., (1, 0) or (-1, 0))
-            potentialMoves[0] = new Vector2Int(stepX, 0);
-            // 2. Vertical move (e.g., (0, 1) or (0, -1))
-            potentialMoves[1] = new Vector2Int(0, stepY);
-        } else { // absDy >= absDx (prioritize Y or equal preference)
-            // 1. Vertical move
-            potentialMoves[0] = new Vector2Int(0, stepY);
-            // 2. Horizontal move
-            potentialMoves[1] = new Vector2Int(stepX, 0);
-        }
+            // 3. Attempt the move for this specific step
+            boolean movedThisStep = false;
+            for (Vector2Int direction : potentialMoves) {
+                if (direction.x == 0 && direction.y == 0) continue;
 
-        // Edge Case: If the target is exactly one step away diagonally (e.g., (1, 1))
-        // we only test the top priority move (e.g., (1, 0) then (0, 1)).
-        // This maintains the "single direction" constraint.
+                // Try to move 1 tile
+                if (move(direction.x, direction.y, level, collidables)) {
+                    movedThisStep = true;
+                    break; // Break inner loop (directions), continue outer loop (speed)
+                }
+            }
 
-        // Attempt the moves in order of priority:
-        for (Vector2Int direction : potentialMoves) {
-            // Skip zero moves (e.g., if we are already aligned on an axis)
-            if (direction.x == 0 && direction.y == 0) continue;
-
-            // Try to move. The 'move' method handles collision and wall checks.
-            if (move(direction.x, direction.y, level, collidables)) {
-                return; // Move successful
+            // 4. If we were blocked on all sides, stop trying to use the rest of our speed
+            if (!movedThisStep) {
+                break;
             }
         }
+    }
 
-        // If no single-axis move succeeded, no movement possible this turn.
+    public void moveTowards(Entity target, GameLevel level, Array<Entity> collidables) {
+        moveTowards(target, level, collidables, 1);
     }
 
     public void update(float dt) {
@@ -245,13 +251,13 @@ public class Entity extends Sprite {
         float currentY = pos.y + (targetPos.y - pos.y) * interpolatedProgress;
 
         // World -> Pixels
-        setPosition(currentX * getWidth(), currentY * getHeight());
+        setPosition(currentX * 16, currentY * 16);
 
         // Check if the transition is complete
         if (progress >= 1f) {
             pos.set(targetPos);
             transitionElapsed = 0f;
-            setPosition(pos.x * getWidth(), pos.y * getHeight());
+            setPosition(pos.x * 16, pos.y * 16);
         }
     }
 
@@ -280,12 +286,12 @@ public class Entity extends Sprite {
         float currentX = wiggleStart.x + (wiggleTarget.x - wiggleStart.x) * wiggleOffset;
         float currentY = wiggleStart.y + (wiggleTarget.y - wiggleStart.y) * wiggleOffset;
 
-        setPosition(currentX * getWidth(), currentY * getHeight());
+        setPosition(currentX * 16, currentY * 16);
 
         if (progress >= 1f) {
             isWiggling = false;
             wiggleElapsed = 0f;
-            setPosition(pos.x * getWidth(), pos.y * getHeight());
+            setPosition(pos.x * 16, pos.y * 16);
         }
     }
 
@@ -312,6 +318,26 @@ public class Entity extends Sprite {
 
     public float getWorldPosY() {
         return (float)targetPos.y * getHeight();
+    }
+
+    /**
+     * Logic for the Boss Turn.
+     * @return true if the entity should move/act, false if it is busy (priming).
+     */
+    public boolean processBossTurn() {
+        // Normal enemies always act
+        if (!isBoss) return true;
+
+        if (primeCounter < TURNS_TO_PRIME) {
+            primeCounter++;
+            Gdx.app.log("Boss", "Priming... " + primeCounter + "/" + TURNS_TO_PRIME);
+            // Return false to tell the Manager "Don't move me yet!"
+            return false;
+        } else {
+            // Priming done! Reset for the next cycle and allow movement.
+            primeCounter = 0;
+            return true;
+        }
     }
 
     /**
@@ -369,7 +395,7 @@ public class Entity extends Sprite {
     public void setPos(Vector2Int newPos) {
         pos.set(newPos);
         targetPos.set(newPos);
-        setPosition(pos.x * getWidth(), pos.y * getHeight());
+        setPosition(pos.x * 16, pos.y * 16);
         transitionElapsed = 0f;
         isWiggling = false;
     }
@@ -385,6 +411,12 @@ public class Entity extends Sprite {
 
     public Entity withCollisionCallback(CollisionCallback collisionCallback) {
         this.collisionCallback = collisionCallback;
+        return this;
+    }
+
+    public Entity asEnemy(GameLevel.EnemyType enemyType, boolean isBoss) {
+        this.enemyType = enemyType;
+        this.isBoss = isBoss;
         return this;
     }
 
@@ -415,6 +447,10 @@ public class Entity extends Sprite {
     }
 
     public boolean isEnemy() {
+        return enemyType != null;
+    }
+
+    public boolean isBoss() {
         return enemyType != null;
     }
 

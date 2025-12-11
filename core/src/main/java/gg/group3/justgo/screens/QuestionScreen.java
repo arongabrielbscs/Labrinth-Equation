@@ -175,7 +175,7 @@ public class QuestionScreen extends Stage {
         if (!isVisible) return;
         Gdx.gl.glEnable(GL20.GL_BLEND);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(0f, 0f, 0f, 0.9f);
+        shapeRenderer.setColor(0f, 0f, 0f, 0.85f);
         shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
