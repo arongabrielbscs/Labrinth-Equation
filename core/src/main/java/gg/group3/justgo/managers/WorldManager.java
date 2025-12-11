@@ -52,7 +52,7 @@ public class WorldManager {
             ).withCollisionCallback((parent, other) -> {
                 // Generate problem and notify the listener (UI)
                 MathGen problem = MathGen.generateBasicArithmetic(10);
-                listener.onQuestionTriggered(other, problem);
+                listener.onQuestionTriggered(parent, problem);
             })
             .health(data.type.maxHp)
             .asEnemy(data.type, true);
