@@ -81,7 +81,7 @@ public class MathGen {
         return new MathGen(String.valueOf(result), question, options);
     }
 
-    public static MathGen generateFindX(int maxNum) {
+    private static MathGen generateFindX(int maxNum) {
         int operation = random.nextInt(4);
         String question;
         int x; // The value of X (correct answer)
@@ -142,7 +142,7 @@ public class MathGen {
         return new MathGen(String.valueOf(x), question, options);
     }
 
-    public static MathGen generatePercentage(int maxNum) {
+    private static MathGen generatePercentage(int maxNum) {
         int percent = random.nextInt(90) + 10; // 10% to 99%
         int base = random.nextInt(maxNum) + 1; // number to get percentage of
 
@@ -196,7 +196,23 @@ public class MathGen {
         return new MathGen(correctAnswer, question, options);
     }
 
+    public static MathGen getForLevel(int level, boolean isBoss) {
+        // Bosses get harder scalar/difficulty
+        int difficulty = isBoss ? 2 : 1;
 
+        switch (level) {
+            case 2:
+                // Level 2: Percentages (Scale max number by difficulty)
+                return generatePercentage(isBoss ? 200 : 50);
+            case 3:
+                // Level 3: Algebra (Scale x range by difficulty)
+                return generateFindX(difficulty);
+            case 1:
+            default:
+                // Level 1: Basic Arithmetic
+                return generateBasicArithmetic(isBoss ? 50 : 10);
+        }
+    }
     public String getAnswer() { return answer; }
     public String getQuestion() { return question; }
     public Array<String> getOptions() { return options; }

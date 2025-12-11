@@ -20,14 +20,16 @@ public class WorldManager {
     private Array<SpikeEntity> spikes;
     private final WorldEventListener listener;
     private final VisibilityManager visibilityManager;
+    private final int currentLevelIndex;
 
-    public WorldManager(String levelPath, Texture atlas, WorldEventListener listener) {
+    public WorldManager(String levelPath, Texture atlas, WorldEventListener listener, int levelIndex) {
         this.level = new GameLevel(levelPath);
         this.visibilityManager = new VisibilityManager(level.getWidth(), level.getHeight());
         this.listener = listener;
         this.doors = new Array<>();
         this.enemies = new Array<>();
         this.spikes = new Array<>();
+        this.currentLevelIndex = levelIndex;
 
         this.player = new Entity(
             new TextureRegion(atlas, 0, 0, 16, 16),
@@ -35,7 +37,8 @@ public class WorldManager {
             level.getPlayerPosition().y
         ).withCollisionCallback((parent, other) -> {
             // Generate problem and notify the listener (UI)
-            MathGen problem = MathGen.generateBasicArithmetic(10);
+            boolean isBoss = other.isBoss();
+            MathGen problem = MathGen.getForLevel(currentLevelIndex, isBoss);
             listener.onQuestionTriggered(other, problem);
         })
         .health(5);
@@ -50,8 +53,8 @@ public class WorldManager {
                 data.position.x,
                 data.position.y
             ).withCollisionCallback((parent, other) -> {
-                // Generate problem and notify the listener (UI)
-                MathGen problem = MathGen.generateBasicArithmetic(10);
+                boolean isBoss = parent.isBoss(); // 'parent' is the enemy here
+                MathGen problem = MathGen.getForLevel(currentLevelIndex, isBoss);
                 listener.onQuestionTriggered(parent, problem);
             })
             .health(data.type.maxHp)
@@ -84,7 +87,8 @@ public class WorldManager {
             TextureRegion region = new TextureRegion(atlas, atlX * 16, atlY * 16, 16, 16);
             enemies.add(new Entity(region, enemyData.position.x, enemyData.position.y)
                 .withCollisionCallback((parent, other) -> {
-                    MathGen problem = MathGen.generateBasicArithmetic(30);
+                    boolean isBoss = parent.isBoss(); // 'parent' is the enemy here
+                    MathGen problem = MathGen.getForLevel(currentLevelIndex, isBoss);
                     listener.onQuestionTriggered(parent, problem);
                 })
                 .asEnemy(enemyData.type)

@@ -17,14 +17,18 @@ import gg.group3.justgo.utils.MathGen;
 
 public class GameScreen implements Screen {
     private final JustGo game;
-    private final OrthogonalTiledMapRenderer tiledMapRenderer;
+    private OrthogonalTiledMapRenderer tiledMapRenderer;
     private final QuestionScreen questionScreen;
     private final HUD hud;
 
-    private final WorldManager worldManager;
+    private WorldManager worldManager;
 
     // NEW: Counter for the boss battle
     private int questionsQueue = 0;
+
+    // Level Management
+    private int currentLevelIndex = 1;
+    private final int MAX_LEVELS = 3;
 
     public GameScreen(JustGo game) {
         this.game = game;
@@ -51,27 +55,28 @@ public class GameScreen implements Screen {
             public void onCancel() { }
         }, heartRegion);
 
-        worldManager = new WorldManager("levels/testlevel.tmx", game.atlas, new WorldEventListener() {
-            @Override
-            public void onQuestionTriggered(Entity target, MathGen problem) {
-                if (target.isBoss()) {
-                    questionsQueue = 3;
-                } else {
-                    questionsQueue = 1;
-                }
-
-                showQuestionUI(target, problem);
-            }
-
-            @Override
-            public void onGameOver() {
-                // Handle Game over logic
-            }
-        });
-
-        tiledMapRenderer = new OrthogonalTiledMapRenderer(worldManager.getLevel().getRawLevel());
+//        worldManager = new WorldManager("levels/testlevel.tmx", game.atlas, new WorldEventListener() {
+//            @Override
+//            public void onQuestionTriggered(Entity target, MathGen problem) {
+//                if (target.isBoss()) {
+//                    questionsQueue = 3;
+//                } else {
+//                    questionsQueue = 1;
+//                }
+//
+//                showQuestionUI(target, problem);
+//            }
+//
+//            @Override
+//            public void onGameOver() {
+//                // Handle Game over logic
+//            }
+//        });
+//
+//        tiledMapRenderer = new OrthogonalTiledMapRenderer(worldManager.getLevel().getRawLevel());
 
         hud = new HUD(game.batch, heartRegion);
+        loadLevel(currentLevelIndex);
     }
 
     private void showQuestionUI(Entity target, MathGen problem) {
@@ -86,48 +91,83 @@ public class GameScreen implements Screen {
         questionScreen.show();
     }
 
-    // Helper method to keep code clean
-    private void continueBattle(Entity enemy) {
-        // Generate a new math problem (Difficulty 30)
-        MathGen nextProblem = MathGen.generateBasicArithmetic(8);
+    private void loadLevel(int levelIndex) {
+        Gdx.app.log("GameScreen", "Loading Level " + levelIndex);
+        if (worldManager != null) worldManager.dispose();
+        if (tiledMapRenderer != null) tiledMapRenderer.dispose();
 
-        // Refresh the UI with: New Question, New Options, Updated Hearts
-        questionScreen.setQuestion(
-            nextProblem.getQuestion(),
-            nextProblem.getAnswer(),
-            nextProblem.getOptions(),
-            enemy,
-            worldManager.getPlayer().getHealth() // Pass updated player HP
-        );
+        String mapPath = "levels/level" + levelIndex + ".tmx";
+
+        // FIX: Pass 'levelIndex' to the new constructor
+        worldManager = new WorldManager(mapPath, game.atlas, createWorldListener(), levelIndex);
+
+        tiledMapRenderer = new OrthogonalTiledMapRenderer(worldManager.getLevel().getRawLevel());
+        questionScreen.hide();
+        questionsQueue = 0;
     }
 
-    // NEW: Centralized Battle Flow
     private void handleBattleFlow(Entity enemy) {
-        questionsQueue--; // Decrement the queue
+        questionsQueue--;
 
-        // 1. Check if Battle Ended (Someone died)
-        if (enemy.getHealth() <= 0 || worldManager.getPlayer().getHealth() <= 0) {
+        // 1. CHECK IF BATTLE ENDED (Entity Died)
+        if (enemy.getHealth() <= 0) {
             questionScreen.hide();
             questionsQueue = 0;
 
-            if (enemy.getHealth() <= 0 && enemy.isBoss()) {
-                Gdx.app.log("Game", "BOSS DEFEATED!");
+            // --- ENDGAME CHECK: DID WE KILL THE BOSS? ---
+            if (enemy.isBoss()) {
+                Gdx.app.log("Game", "BOSS DEFEATED! Proceeding to next level...");
+
+                // Advance to next level
+                currentLevelIndex++;
+
+                if (currentLevelIndex > MAX_LEVELS) {
+                    Gdx.app.log("Game", "YOU WIN THE GAME! Looping back to Level 1.");
+                    currentLevelIndex = 1; // Or go to Main Menu
+                }
+
+                loadLevel(currentLevelIndex);
             }
             return;
         }
 
-        // 2. Check if we have more questions queued
+        // 2. CHECK IF PLAYER DIED
+        if (worldManager.getPlayer().getHealth() <= 0) {
+            questionScreen.hide();
+            // Trigger Game Over Logic via Listener
+            createWorldListener().onGameOver();
+            return;
+        }
+
+        // 3. CONTINUE BATTLE (Queue not empty)
         if (questionsQueue > 0) {
-            // Generate next question immediately!
-            // Boss gets harder math (100), Normal gets easy (10)
             int difficulty = enemy.isBoss() ? 100 : 10;
             MathGen nextProblem = MathGen.generateBasicArithmetic(difficulty);
-
             showQuestionUI(enemy, nextProblem);
         } else {
-            // Queue empty, close screen
             questionScreen.hide();
         }
+    }
+
+    private WorldEventListener createWorldListener() {
+        return new WorldEventListener() {
+            @Override
+            public void onQuestionTriggered(Entity target, MathGen problem) {
+                if (target.isBoss()) {
+                    questionsQueue = 3;
+                } else {
+                    questionsQueue = 1;
+                }
+                showQuestionUI(target, problem);
+            }
+
+            @Override
+            public void onGameOver() {
+                // Handle Player Death (Restart Level?)
+                Gdx.app.log("Game", "Player Died - Restarting Level");
+                loadLevel(currentLevelIndex);
+            }
+        };
     }
 
     private void update(float dt) {
