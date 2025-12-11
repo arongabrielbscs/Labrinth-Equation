@@ -492,7 +492,7 @@ public class Entity extends Sprite {
     }
 
     public boolean isBoss() {
-        return enemyType != null;
+        return isBoss;
     }
 
     public GameLevel.EnemyType getEnemyType() {
