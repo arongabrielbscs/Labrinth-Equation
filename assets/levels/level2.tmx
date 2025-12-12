@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="272">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="273">
  <tileset firstgid="1" source="../tilesets/atlas.tsx"/>
  <layer id="1" name="Tiles" width="50" height="50">
   <data encoding="csv">
@@ -230,5 +230,6 @@
   <object id="269" name="Spike" type="Entity" gid="67" x="224" y="640" width="16" height="16"/>
   <object id="270" name="Spike" type="Entity" gid="67" x="240" y="656" width="16" height="16"/>
   <object id="271" name="Spike" type="Entity" gid="67" x="240" y="640" width="16" height="16"/>
+  <object id="272" name="WillowQueen" type="Entity" gid="94" x="688" y="128" width="16" height="16"/>
  </objectgroup>
 </map>

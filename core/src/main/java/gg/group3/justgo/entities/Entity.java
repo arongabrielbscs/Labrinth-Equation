@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import gg.group3.justgo.GameLevel;
+import gg.group3.justgo.managers.SoundManager;
 import gg.group3.justgo.math.Vector2Int;
 
 public class Entity extends Sprite {
@@ -123,6 +124,7 @@ public class Entity extends Sprite {
         if (dx != 0) {
             setFlip(dx <= 0, false);
         }
+        SoundManager.getInstance().playSound("step", 1.1f);
         return true;
     }
 
