@@ -114,11 +114,14 @@ public class WorldManager {
                 if (type == GameLevel.ItemType.HealthPotion) {
 
                     SoundManager.getInstance().playSound("consume-potion");
-                    
+
                     other.heal(type.value);
                     Gdx.app.log("Pickup", "Healed! HP is now: " + other.getHealth());
                 }
                 else if (type == GameLevel.ItemType.Dagger) {
+
+                    SoundManager.getInstance().playSound("dagger-equip");
+
                     other.increaseDamage(type.value);
                     Gdx.app.log("Pickup", "Damage Up! Now deals: " + other.getDamageValue());
                 }
