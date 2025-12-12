@@ -35,7 +35,7 @@ a:audio/boss_hit.mp3:audio/boss_hit-3488093a776c4dd243604f09eb07ce3b.mp3:45312:a
 a:audio/player-move.wav:audio/player-move-199c9ba74ce0289d0afc44ac5ffeee4d.wav:38216:audio/x-wav:1
 d:levels:levels:0:application/unknown:1
 b:levels/level3.tmx:levels/level3-88d57154d924b80f174a68ae0c6d3ca6.tmx:11996:application/unknown:1
-b:levels/level2.tmx:levels/level2-3396d36aa608902cd9c7fe927777b1ec.tmx:25387:application/unknown:1
+b:levels/level2.tmx:levels/level2-d8b9a748c54f42b308505e4cbeb48657.tmx:28902:application/unknown:1
 b:levels/level1.tmx:levels/level1-7df4987852aafd9c90dfd92b8a0f5cfa.tmx:9441:application/unknown:1
 t:com/badlogic/gdx/graphics/g3d/particles/particles.fragment.glsl:particles.fragment-b90524761fdf09b0a836056d590c30b8.glsl:820:application/unknown:1
 t:com/badlogic/gdx/graphics/g3d/particles/particles.vertex.glsl:particles.vertex-f25b8b2fae10b9bfa09bfdd484923148.glsl:2886:application/unknown:1
