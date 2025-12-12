@@ -37,8 +37,8 @@ a:audio/dagger-equip.MP3:audio/dagger-equip-aef514922cafd28c3fba2d1a02192da2.MP3
 a:audio/boss_hit.mp3:audio/boss_hit-3488093a776c4dd243604f09eb07ce3b.mp3:45312:audio/mpeg:1
 a:audio/player-move.wav:audio/player-move-199c9ba74ce0289d0afc44ac5ffeee4d.wav:38216:audio/x-wav:1
 d:levels:levels:0:application/unknown:1
-b:levels/level3.tmx:levels/level3-95ad186b01042f5c779118a5b0835380.tmx:18874:application/unknown:1
-b:levels/level2.tmx:levels/level2-a4858fe14ab9e705a655790a61d082d7.tmx:32625:application/unknown:1
+b:levels/level3.tmx:levels/level3-a4858fe14ab9e705a655790a61d082d7.tmx:32625:application/unknown:1
+b:levels/level2.tmx:levels/level2-bbb6e82eba01c8a97df67efb4d4def4a.tmx:18874:application/unknown:1
 b:levels/level1.tmx:levels/level1-7df4987852aafd9c90dfd92b8a0f5cfa.tmx:9441:application/unknown:1
 t:com/badlogic/gdx/graphics/g3d/particles/particles.fragment.glsl:particles.fragment-b90524761fdf09b0a836056d590c30b8.glsl:820:application/unknown:1
 t:com/badlogic/gdx/graphics/g3d/particles/particles.vertex.glsl:particles.vertex-f25b8b2fae10b9bfa09bfdd484923148.glsl:2886:application/unknown:1
