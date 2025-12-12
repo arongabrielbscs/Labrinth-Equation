@@ -3,7 +3,7 @@ i:atlas.png:atlas-22e9cbe1e3a6d73412312e7529052877.png:1231:image/png:1
 d:tilesets:tilesets:0:application/unknown:1
 b:tilesets/atlas.tsx:tilesets/atlas-975cc19c0c0bc369d765fd865819e92c.tsx:806:application/unknown:1
 b:atlas.aseprite:atlas-5d6252938632210951d5de3d6f65f098.aseprite:5583:application/unknown:1
-t:assets.txt:assets-56ca4568ebd7a549158b994601a32772.txt:607:text/plain:1
+t:assets.txt:assets-3b639863e33bae4aafa2f676ada70db6.txt:629:text/plain:1
 d:images:images:0:application/unknown:1
 i:images/atlas.png:images/atlas-1979365754b2b3aee9f28bdb015f39d3.png:7803:image/png:1
 i:images/title.png:images/title-35e92ad5de72459e2cbb3b192fa825fb.png:62602:image/png:1
@@ -26,6 +26,7 @@ i:fonts/ui-font.png:fonts/ui-font-603a4dd4b664a520484a656268c71899.png:23728:ima
 t:fonts/question-font.fnt:fonts/question-font-e0d6f6c81643a078eb6d603f7bb7e1fe.fnt:23051:application/unknown:1
 d:audio:audio:0:application/unknown:1
 a:audio/bg.mp3:audio/bg-8151ea0d371ab469fd114968d437ac78.mp3:1442723:audio/mpeg:1
+a:audio/doorOpening.mp3:audio/doorOpening-21e64bc305eae8fa056f72acf178462f.mp3:65280:audio/mpeg:1
 a:audio/hit.mp3:audio/hit-ce6281dc5b1b1a978ce6f26198e2ac0d.mp3:67709:audio/mpeg:1
 a:audio/splat.ogg:audio/splat-901eca11a4d155d56384056e1cd7c44a.ogg:12141:audio/ogg:1
 a:audio/on_wrong.wav:audio/on_wrong-5d20559e3178c10e90ccb10131039996.wav:366016:audio/x-wav:1
