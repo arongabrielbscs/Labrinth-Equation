@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import gg.group3.justgo.screens.GameScreen;
+import gg.group3.justgo.screens.MainMenuScreen;
+import gg.group3.justgo.screens.SplashScreen;
 
 public class JustGo extends Game {
     public FitViewport viewport;
@@ -18,7 +20,8 @@ public class JustGo extends Game {
         batch = new SpriteBatch();
         atlas = new Texture("images/atlas.png");
 
-        setScreen(new GameScreen(this));
+//        setScreen(new GameScreen(this));
+        setScreen(new SplashScreen(this));
     }
 
     @Override
