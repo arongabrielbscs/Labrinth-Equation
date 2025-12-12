@@ -14,8 +14,10 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+
 import gg.group3.justgo.JustGo;
 import gg.group3.justgo.entities.Entity;
+import gg.group3.justgo.entities.SpikeEntity;
 import gg.group3.justgo.managers.SoundManager;
 import gg.group3.justgo.managers.WorldEventListener;
 import gg.group3.justgo.managers.WorldManager;
@@ -105,21 +107,28 @@ public class GameScreen implements Screen {
             @Override
             public void onCorrect(Entity enemy) {
                 SoundManager.getInstance().playSound("correct");
-                SoundManager.getInstance().playSound("hit");
 
                 int damageDealt = worldManager.getPlayer().getDamageValue();
                 enemy.damage(damageDealt);
 
-                if (enemy.getHealth() <= 0) {
+                if (enemy.getHealth() <= 0 && enemy.isEnemy()) {
                     SoundManager.getInstance().playSound("kill");
+                } else {
+                    if (enemy.isEnemy()) {
+                        SoundManager.getInstance().playSound("hit");
+                    } else if(! (enemy instanceof SpikeEntity)) {
+                        SoundManager.getInstance().playSound("doorOpening");
+                    }
                 }
                 handleBattleFlow(enemy);
             }
 
             @Override
             public void onWrong(Entity enemy) {
-                SoundManager.getInstance().playSound("wrong");
-                SoundManager.getInstance().playSound("hit");
+                    SoundManager.getInstance().playSound("wrong");
+                if (enemy.isEnemy()) {
+                    SoundManager.getInstance().playSound("hit");
+                }
 
                 enemy.heal(1);
                 int dmg = enemy.isBoss() ? 2 : 1;

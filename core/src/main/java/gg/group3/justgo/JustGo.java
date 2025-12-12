@@ -31,6 +31,7 @@ public class JustGo extends Game {
         audio.loadSound("pickup",  "audio/pickup.mp3");
         audio.loadSound("click",   "audio/select.mp3");   // You have this, let's use it!
         audio.loadSound("splat",   "audio/splat.ogg");
+        audio.loadSound("doorOpening",   "audio/doorOpening.mp3");
 
         // Load Music
         audio.playMusic("audio/bg.mp3");
