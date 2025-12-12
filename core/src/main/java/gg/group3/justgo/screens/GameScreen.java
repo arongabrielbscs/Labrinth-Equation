@@ -112,10 +112,10 @@ public class GameScreen implements Screen {
                 enemy.damage(damageDealt);
 
                 if (enemy.getHealth() <= 0) {
-                    if(! (enemy instanceof SpikeEntity)) {
-                        SoundManager.getInstance().playSound("doorOpening");
-                    } else if (enemy.isEnemy()) {
+                    if(enemy.isEnemy()) {
                         SoundManager.getInstance().playSound("kill");
+                    } else if (! (enemy instanceof SpikeEntity)) {
+                        SoundManager.getInstance().playSound("doorOpening");
                     }
                 } else {
                     if (enemy.isEnemy()) {
