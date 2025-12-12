@@ -28,7 +28,7 @@ public class JustGo extends Game {
         audio.loadSound("kill",    "audio/boss_hit.mp3"); // Use for boss or death
         audio.loadSound("correct", "audio/on_correct.mp3");
         audio.loadSound("wrong",   "audio/on_wrong.wav");
-        audio.loadSound("pickup",  "audio/pickup.mp3");
+        audio.loadSound("consume-potion",  "audio/consume-potion.mp3");
         audio.loadSound("click",   "audio/select.mp3");   // You have this, let's use it!
         audio.loadSound("splat",   "audio/splat.ogg");
         audio.loadSound("doorOpening",   "audio/doorOpening.mp3");

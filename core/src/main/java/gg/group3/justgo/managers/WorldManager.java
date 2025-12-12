@@ -112,6 +112,9 @@ public class WorldManager {
                 GameLevel.ItemType type = parent.getItemType();
 
                 if (type == GameLevel.ItemType.HealthPotion) {
+
+                    SoundManager.getInstance().playSound("consume-potion");
+                    
                     other.heal(type.value);
                     Gdx.app.log("Pickup", "Healed! HP is now: " + other.getHealth());
                 }
