@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+
 import gg.group3.justgo.GameLevel;
 import gg.group3.justgo.entities.Entity;
 import gg.group3.justgo.entities.SpikeEntity;
@@ -166,6 +167,8 @@ public class WorldManager {
             if (spike.getPos().equals(player.getPos()) && spike.isActive()) {
                 // Trigger the Question Screen!
                 listener.onQuestionTriggered(spike, spike.getTrapProblem());
+
+                SoundManager.getInstance().playSound("splat");
 
                 // Optional: If you want the spike to turn off immediately after triggering:
                 // spike.resetState();
