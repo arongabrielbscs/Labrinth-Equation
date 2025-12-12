@@ -76,7 +76,7 @@ public class WorldManager {
             doors.add(
                 new Entity(new TextureRegion(atlas, 16, 32, 16, 16), doorPos.x, doorPos.y)
                     .withCollisionCallback((parent, other) -> {
-                        // Generate problem and notify the listener (UI)
+                        // Generate problem and notify the listener (UI)                        
                         MathGen problem = MathGen.generateBasicArithmetic(10);
                         listener.onQuestionTriggered(parent, problem);
                     })
