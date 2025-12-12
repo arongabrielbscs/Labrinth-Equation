@@ -18,6 +18,7 @@ public class GameLevel {
     private final Array<Vector2Int> doorPositions;
     private final Array<Vector2Int> spikePositions;
     private final Array<EnemyData> enemies;
+    private final Array<ItemData> items;
     private final int width, height;
 
     public enum EnemyType {
@@ -56,11 +57,38 @@ public class GameLevel {
         }
     }
 
+    public enum ItemType {
+        // Name(AtlasX, AtlasY, Value)
+        // Value = Heal Amount for Potion, Damage Bonus for Dagger
+        HealthPotion(2, 9, 2), // Uses Heart Icon, Heals 2 HP
+        Dagger(3, 9, 1);        // Needs a sprite at 0,80 (row 5), Adds +1 Damage
+
+        public final int atlasX;
+        public final int atlasY;
+        public final int value;
+
+        ItemType(int x, int y, int v) {
+            this.atlasX = x;
+            this.atlasY = y;
+            this.value = v;
+        }
+    }
+
     public static class EnemyData {
         public final Vector2Int position;
         public final EnemyType type;
 
         public EnemyData(Vector2Int position, EnemyType type) {
+            this.position = position;
+            this.type = type;
+        }
+    }
+
+    public static class ItemData {
+        public final Vector2Int position;
+        public final ItemType type;
+
+        public ItemData(Vector2Int position, ItemType type) {
             this.position = position;
             this.type = type;
         }
@@ -75,6 +103,7 @@ public class GameLevel {
         doorPositions = new Array<>();
         spikePositions = new Array<>();
         enemies = new Array<>();
+        items = new Array<>();
         for (MapObject obj : entityLayer.getObjects()) {
             float x = obj.getProperties().get("x", float.class);
             float y = obj.getProperties().get("y", float.class);
@@ -91,6 +120,12 @@ public class GameLevel {
                         break;
                     case "Spike":
                         spikePositions.add(position);
+                        break;
+                    case "Health":
+                        items.add(new ItemData(position, ItemType.HealthPotion));
+                        break;
+                    case "Dagger":
+                        items.add(new ItemData(position, ItemType.Dagger));
                         break;
                     case "Beanling":
                         enemies.add(new EnemyData(position, EnemyType.Beanling));
@@ -179,6 +214,8 @@ public class GameLevel {
     public Array<EnemyData> getEnemies() {
         return enemies;
     }
+
+    public Array<ItemData> getItems() { return items; }
 
     public EnemyData getBossData() {
         return bossData;
