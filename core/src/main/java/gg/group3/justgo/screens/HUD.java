@@ -1,9 +1,12 @@
 package gg.group3.justgo.screens;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -11,42 +14,59 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 public class HUD implements Disposable {
     public final Stage stage;
 
+    private final Table rootTable;
     private final Table heartTable;
+    private final Label damageLabel;
+
     private final TextureRegion heartTexture;
 
     private int lastKnownHealth = -1;
+    private int lastKnownDamage = -1;
 
-    public HUD(SpriteBatch batch, TextureRegion heartTexture) {
+    public HUD(SpriteBatch batch, TextureRegion heartTexture, TextureRegion daggerTexture) {
         this.heartTexture = heartTexture;
 
-        // Use ScreenViewport for UI so it stays the same size regardless of window zoom
         stage = new Stage(new ScreenViewport(), batch);
 
-        // Create the layout table
-        heartTable = new Table();
-        heartTable.top().left(); // Anchor to Top-Left
-        heartTable.setFillParent(true); // Make table size of the screen
-        heartTable.pad(10); // Add some padding from the screen edge
+        rootTable = new Table();
+        rootTable.top().left();
+        rootTable.setFillParent(true);
+        rootTable.pad(10);
 
-        stage.addActor(heartTable);
+        // 1. HEART ROW
+        heartTable = new Table();
+        rootTable.add(heartTable).left().row();
+
+        // 2. DAMAGE ROW (Icon + Number)
+        Table damageTable = new Table();
+        Image swordIcon = new Image(daggerTexture);
+
+        // Simple default font style
+        Label.LabelStyle style = new Label.LabelStyle(new BitmapFont(), Color.WHITE);
+        damageLabel = new Label("1", style);
+
+        damageTable.add(swordIcon).size(24, 24).padRight(5);
+        damageTable.add(damageLabel);
+
+        rootTable.add(damageTable).left().padTop(5);
+
+        stage.addActor(rootTable);
     }
 
-    public void update(int playerHealth) {
-        // Optimization: Don't redraw if health hasn't changed
-        if (playerHealth == lastKnownHealth) return;
+    public void update(int playerHealth, int playerDamage) {
+        // Update Hearts
+        if (playerHealth != lastKnownHealth) {
+            lastKnownHealth = playerHealth;
+            heartTable.clearChildren();
+            for (int i = 0; i < playerHealth; i++) {
+                heartTable.add(new Image(heartTexture)).width(32).height(32).padRight(4);
+            }
+        }
 
-        lastKnownHealth = playerHealth;
-        heartTable.clearChildren(); // Clear old hearts
-
-        // Add a heart image for every HP point
-        for (int i = 0; i < playerHealth; i++) {
-            Image heartImage = new Image(heartTexture);
-
-            // Optional: Scale up the hearts if your pixel art is tiny (16x16)
-            // Scene2D images scale visually, so we set the size in the cell
-            heartTable.add(heartImage)
-                .width(32).height(32) // Render at 32x32 size
-                .padRight(4);         // Gap between hearts
+        // Update Damage Text
+        if (playerDamage != lastKnownDamage) {
+            lastKnownDamage = playerDamage;
+            damageLabel.setText("DMG: " + playerDamage);
         }
     }
 
@@ -61,6 +81,6 @@ public class HUD implements Disposable {
 
     @Override
     public void dispose() {
-
+        stage.dispose();
     }
 }

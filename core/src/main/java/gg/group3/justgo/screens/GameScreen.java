@@ -34,6 +34,7 @@ public class GameScreen implements Screen {
         this.game = game;
 
         TextureRegion heartRegion = new TextureRegion(game.atlas, 0, 144, 16, 16);
+        TextureRegion daggerRegion = new TextureRegion(game.atlas, 0, 160, 16, 16);
         questionScreen = new QuestionScreen(new QuestionScreen.Answered() {
             @Override
             public void onCorrect(Entity enemy) {
@@ -56,7 +57,7 @@ public class GameScreen implements Screen {
             public void onCancel() { }
         }, heartRegion);
 
-        hud = new HUD(game.batch, heartRegion);
+        hud = new HUD(game.batch, heartRegion, daggerRegion);
         loadLevel(currentLevelIndex);
     }
 
@@ -67,7 +68,8 @@ public class GameScreen implements Screen {
             problem.getAnswer(),
             problem.getOptions(), // <--- Pass the generated options
             target,
-            worldManager.getPlayer().getHealth()
+            worldManager.getPlayer().getHealth(),
+            worldManager.getPlayer().getDamageValue()
         );
         questionScreen.show();
     }
@@ -202,7 +204,7 @@ public class GameScreen implements Screen {
 
         worldManager.getVisibilityManager().render(16, 16, game.viewport.getCamera());
 
-        hud.update(worldManager.getPlayer().getHealth());
+        hud.update(worldManager.getPlayer().getHealth(), worldManager.getPlayer().getDamageValue());
         hud.draw();
     }
 

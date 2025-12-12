@@ -35,6 +35,7 @@ public class QuestionScreen extends Stage {
     private final Array<TextButton> optionButtons;
     private Table enemyHeartTable; // NEW: Table for enemy health
     private Table playerHeartTable; // NEW: Table for player health
+    private Label playerDamageLabel;
 
     private String correctAnswer;
     private boolean isVisible = false;
@@ -98,7 +99,12 @@ public class QuestionScreen extends Stage {
         Table playerContainer = new Table();
         playerContainer.add(new Label("PLAYER HP: ", skin)).padRight(10);
         playerHeartTable = new Table();
-        playerContainer.add(playerHeartTable);
+        playerContainer.add(playerHeartTable).padRight(20);
+
+        // Add Damage Stat
+        playerDamageLabel = new Label("DMG: 1", skin);
+        playerContainer.add(playerDamageLabel);
+
         mainTable.add(playerContainer).colspan(2).padTop(20);
 
         addActor(mainTable);
@@ -113,7 +119,7 @@ public class QuestionScreen extends Stage {
     }
 
     // UPDATED: Now accepts player health
-    public void setQuestion(String question, String answer, Array<String> options, Entity target, int playerHealth) {
+    public void setQuestion(String question, String answer, Array<String> options, Entity target, int playerHealth, int playerDamage) {
         this.correctAnswer = answer;
         this.whoQuestionedThePlayer = target;
 
@@ -134,6 +140,9 @@ public class QuestionScreen extends Stage {
 
         // Update Player Health display
         updateHeartDisplay(playerHeartTable, playerHealth);
+
+        // Update Damage Label
+        playerDamageLabel.setText("DMG: " + playerDamage);
 
         // Update Buttons
         for (int i = 0; i < 4; i++) {

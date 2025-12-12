@@ -134,13 +134,13 @@ public class WorldManager {
 
     // THE CORE TURN LOGIC
     public void processTurn(int dirX, int dirY) {
-        Array<Entity> allCollidables = ArrayUtils.combineArrays(doors, enemies, items);
+        Array<Entity> playerCollisions = ArrayUtils.combineArrays(doors, enemies, items);
         if (boss != null && boss.getHealth() > 0) {
-            allCollidables.add(boss); // Add Boss to collisions
+            playerCollisions.add(boss); // Add Boss to collisions
         }
 
         // 1. Attempt Player Move
-        boolean playerMoved = player.move(dirX, dirY, level, allCollidables);
+        boolean playerMoved = player.move(dirX, dirY, level, playerCollisions);
 
 
         // 3. UPDATE SPIKES (Cycle: Off -> Priming -> Active)
@@ -151,11 +151,12 @@ public class WorldManager {
 
         // 2. If player successfully moved (spent a turn), update enemies
         if (playerMoved) {
+            Array<Entity> enemyCollisions = ArrayUtils.combineArrays(doors, enemies);
             visibilityManager.update(player.getPos(), level, doors);
 
-            allCollidables.add(player);
-            updateEnemies(allCollidables);
-            updateBoss(allCollidables);
+            enemyCollisions.add(player);
+            updateEnemies(enemyCollisions);
+            updateBoss(enemyCollisions);
         }
     }
 
