@@ -111,13 +111,15 @@ public class GameScreen implements Screen {
                 int damageDealt = worldManager.getPlayer().getDamageValue();
                 enemy.damage(damageDealt);
 
-                if (enemy.getHealth() <= 0 && enemy.isEnemy()) {
-                    SoundManager.getInstance().playSound("kill");
+                if (enemy.getHealth() <= 0) {
+                    if(! (enemy instanceof SpikeEntity)) {
+                        SoundManager.getInstance().playSound("doorOpening");
+                    } else if (enemy.isEnemy()) {
+                        SoundManager.getInstance().playSound("kill");
+                    }
                 } else {
                     if (enemy.isEnemy()) {
                         SoundManager.getInstance().playSound("hit");
-                    } else if(! (enemy instanceof SpikeEntity)) {
-                        SoundManager.getInstance().playSound("doorOpening");
                     }
                 }
                 handleBattleFlow(enemy);
