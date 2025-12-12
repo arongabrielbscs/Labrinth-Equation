@@ -1,0 +1,42 @@
+{
+  "Color": {
+    "white": { "r": 1, "g": 1, "b": 1, "a": 1 },
+    "black": { "r": 0, "g": 0, "b": 0, "a": 1 },
+    "green": { "r": 0.2, "g": 0.6, "b": 0.2, "a": 1 },
+    "gray": { "r": 0.4, "g": 0.4, "b": 0.4, "a": 1 }
+  },
+  "BitmapFont": {
+    "title-font": { "file": "fonts/title-font.fnt" },
+    "ui-font": { "file": "fonts/ui-font.fnt" }
+  },
+  "LabelStyle": {
+    "default": {
+      "font": "ui-font",
+      "fontColor": "white"
+    },
+    "title": {
+      "font": "title-font",
+      "fontColor": "white"
+    }
+  },
+  "TextButtonStyle": {
+    "default": {
+      "font": "ui-font",
+      "fontColor": "white",
+      "up": "button-green",
+      "down": "button-green-pressed"
+    },
+    "quit": {
+      "font": "ui-font",
+      "fontColor": "white",
+      "up": "button-red",
+      "down": "button-red-pressed"
+    }
+  },
+  "ScrollPaneStyle": {
+    "default": {
+      "vScroll": "textfield-background",
+      "vScrollKnob": "button-green"
+    }
+  }
+}

@@ -12,7 +12,7 @@ i:images/splash.jpg:images/splash-dbdeb586471b4e32d2cf36aa44194df4.jpg:524214:im
 d:ui:ui:0:application/unknown:1
 i:ui/question-screen.png:ui/question-screen-21c57d94c41ade4d9c6f46f1cde4267d.png:3486:image/png:1
 t:ui/question-screen.atlas:ui/question-screen-a5aa29ef9fd80e2e3b9b2592c556696c.atlas:270:application/unknown:1
-b:ui/menu.skin:ui/menu-4904de5f35e9042a7437b723ebd2f607.skin:830:application/unknown:1
+b:ui/menu.skin:ui/menu-a438f1af9c467b2511c574325d64c0d4.skin:958:application/unknown:1
 b:ui/question-screen.skin:ui/question-screen-c60eda7f28526b6244d08e68dc085b5a.skin:1174:application/unknown:1
 d:fonts:fonts:0:application/unknown:1
 i:fonts/question-font.png:fonts/question-font-d4b8e3d079a72411b72d161c61759050.png:41695:image/png:1
