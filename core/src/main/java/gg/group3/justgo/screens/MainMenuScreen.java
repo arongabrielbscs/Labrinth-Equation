@@ -30,7 +30,7 @@ public class MainMenuScreen implements Screen {
 
     public MainMenuScreen(JustGo game) {
         this.game = game;
-        stage = new Stage(new FitViewport(320, 180));
+        stage = new Stage(new FitViewport(320, 180), game.batch);
 
         // 1. Load Assets
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("ui/question-screen.atlas"));

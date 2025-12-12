@@ -20,7 +20,7 @@ public class SplashScreen implements Screen {
         this.game = game;
 
         // Use FitViewport to ensure the logo isn't stretched oddly
-        stage = new Stage(new FitViewport(320, 180));
+        stage = new Stage(new FitViewport(320, 180), game.batch);
 
         // 1. Load the JPG
         splashTexture = new Texture(Gdx.files.internal("images/splash.jpg"));
