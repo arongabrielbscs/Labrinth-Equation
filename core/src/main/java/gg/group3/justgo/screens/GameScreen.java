@@ -37,7 +37,8 @@ public class GameScreen implements Screen {
         questionScreen = new QuestionScreen(new QuestionScreen.Answered() {
             @Override
             public void onCorrect(Entity enemy) {
-                enemy.damage(1);
+                int damageDealt = worldManager.getPlayer().getDamageValue();
+                enemy.damage(damageDealt);
                 handleBattleFlow(enemy); // Use new helper
             }
 
@@ -191,6 +192,10 @@ public class GameScreen implements Screen {
         for (Entity enemy : worldManager.getEnemies()) {
             if (enemy.getHealth() <= 0) continue;
             enemy.draw(game.batch);
+        }
+        for (Entity items : worldManager.getItems()) {
+            if (items.getHealth() <= 0) continue;
+            items.draw(game.batch);
         }
 
         game.batch.end();

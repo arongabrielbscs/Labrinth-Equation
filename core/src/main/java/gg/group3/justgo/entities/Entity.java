@@ -37,6 +37,10 @@ public class Entity extends Sprite {
     private int primeCounter = 0;
     private static final int TURNS_TO_PRIME = 5;
 
+    // ITEMS
+    private int damageValue = 1; // Default damage is 1
+    private GameLevel.ItemType itemType = null;
+
     public Entity(TextureRegion region, int posX, int posY) {
         super(region);
         this.pos = new Vector2Int(posX, posY);
@@ -470,6 +474,18 @@ public class Entity extends Sprite {
         this.health = health;
         return this;
     }
+
+    // Call this to turn an entity into an item
+    public Entity asItem(GameLevel.ItemType type) {
+        this.itemType = type;
+        return this;
+    }
+
+    public boolean isItem() { return itemType != null; }
+    public GameLevel.ItemType getItemType() { return itemType; }
+
+    public int getDamageValue() { return damageValue; }
+    public void increaseDamage(int amount) { this.damageValue += amount; }
 
     public void damage(int damage) {
         this.health -= damage;

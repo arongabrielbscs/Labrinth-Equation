@@ -16,6 +16,7 @@ public class WorldManager {
     private final Entity player;
     private Array<Entity> doors;
     private Array<Entity> enemies;
+    private Array<Entity> items;
     private Entity boss;
     private Array<SpikeEntity> spikes;
     private final WorldEventListener listener;
@@ -28,6 +29,7 @@ public class WorldManager {
         this.listener = listener;
         this.doors = new Array<>();
         this.enemies = new Array<>();
+        this.items = new Array<>();
         this.spikes = new Array<>();
         this.currentLevelIndex = levelIndex;
 
@@ -96,6 +98,34 @@ public class WorldManager {
             );
         }
 
+        // Initialize Items
+        for (GameLevel.ItemData itemData : level.getItems()) {
+            TextureRegion region = new TextureRegion(atlas, itemData.type.atlasX * 16, itemData.type.atlasY * 16, 16, 16);
+
+            Entity item = new Entity(region, itemData.position.x, itemData.position.y)
+                .asItem(itemData.type);
+
+            // --- THE PICKUP LOGIC ---
+            item.withCollisionCallback((parent, other) -> {
+                // 'parent' is the Item, 'other' is the Player
+                GameLevel.ItemType type = parent.getItemType();
+
+                if (type == GameLevel.ItemType.HealthPotion) {
+                    other.heal(type.value);
+                    Gdx.app.log("Pickup", "Healed! HP is now: " + other.getHealth());
+                }
+                else if (type == GameLevel.ItemType.Dagger) {
+                    other.increaseDamage(type.value);
+                    Gdx.app.log("Pickup", "Damage Up! Now deals: " + other.getDamageValue());
+                }
+
+                // Remove the item from the world
+                parent.setHealth(0);
+            });
+
+            items.add(item); // Add to a new 'items' array in WorldManager
+        }
+
         // INITIALIZE SPIKES
         for (Vector2Int pos : level.getSpikePositions()) {
             spikes.add(new SpikeEntity(atlas, pos.x, pos.y));
@@ -104,7 +134,7 @@ public class WorldManager {
 
     // THE CORE TURN LOGIC
     public void processTurn(int dirX, int dirY) {
-        Array<Entity> allCollidables = ArrayUtils.combineArrays(doors, enemies);
+        Array<Entity> allCollidables = ArrayUtils.combineArrays(doors, enemies, items);
         if (boss != null && boss.getHealth() > 0) {
             allCollidables.add(boss); // Add Boss to collisions
         }
@@ -186,6 +216,7 @@ public class WorldManager {
     public Entity getPlayer() { return player; }
     public Entity getBoss() { return boss; }
     public Array<Entity> getEnemies() { return enemies; }
+    public Array<Entity> getItems() { return items; }
     public Array<Entity> getDoors() { return doors; }
     public Array<SpikeEntity> getSpikes() { return spikes; }
     public GameLevel getLevel() { return level; }
