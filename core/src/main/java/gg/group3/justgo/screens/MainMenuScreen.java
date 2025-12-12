@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import gg.group3.justgo.JustGo;
+import gg.group3.justgo.managers.SoundManager;
 
 public class MainMenuScreen implements Screen {
     private final JustGo game;
@@ -76,6 +77,7 @@ public class MainMenuScreen implements Screen {
         playBtn.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                SoundManager.getInstance().playSound("click");
                 game.setScreen(new GameScreen(game));
                 dispose();
             }

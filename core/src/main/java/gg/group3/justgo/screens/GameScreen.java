@@ -9,6 +9,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import gg.group3.justgo.JustGo;
 import gg.group3.justgo.entities.Entity;
+import gg.group3.justgo.managers.SoundManager;
 import gg.group3.justgo.managers.WorldEventListener;
 import gg.group3.justgo.managers.WorldManager;
 import gg.group3.justgo.utils.InputUtils;
@@ -38,13 +39,20 @@ public class GameScreen implements Screen {
         questionScreen = new QuestionScreen(new QuestionScreen.Answered() {
             @Override
             public void onCorrect(Entity enemy) {
+                SoundManager.getInstance().playSound("correct");
+                SoundManager.getInstance().playSound("hit");
                 int damageDealt = worldManager.getPlayer().getDamageValue();
                 enemy.damage(damageDealt);
+
+                if (enemy.getHealth() <= 0) {
+                    SoundManager.getInstance().playSound("kill");
+                }
                 handleBattleFlow(enemy); // Use new helper
             }
 
             @Override
             public void onWrong(Entity enemy) {
+                SoundManager.getInstance().playSound("wrong");
                 enemy.heal(1);
                 // Boss deals more damage?
                 int dmg = enemy.isBoss() ? 2 : 1;
