@@ -87,6 +87,17 @@ public class MainMenuScreen implements Screen {
 
         // --- CREDITS ---
         TextButton creditsBtn = new TextButton("CREDITS", skin);
+        creditsBtn.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                // PLAY CLICK SOUND
+                gg.group3.justgo.managers.SoundManager.getInstance().playSound("click");
+
+                // SWITCH TO CREDITS
+                game.setScreen(new CreditsScreen(game));
+                dispose();
+            }
+        });
         table.add(creditsBtn).width(90).height(20).padBottom(4).row();
 
         // --- QUIT ---

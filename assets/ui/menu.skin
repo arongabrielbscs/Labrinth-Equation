@@ -32,5 +32,11 @@
       "up": "button-red",
       "down": "button-red-pressed"
     }
+  },
+  "ScrollPaneStyle": {
+    "default": {
+      "vScroll": "textfield-background",
+      "vScrollKnob": "button-green"
+    }
   }
 }
