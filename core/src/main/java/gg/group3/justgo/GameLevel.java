@@ -109,6 +109,7 @@ public class GameLevel {
                         break;
                     case "WillowQueen":
                         bossData = new EnemyData(position, EnemyType.WillowQueen);
+                        break;
                     case "Vessel":
                         bossData = new EnemyData(position, EnemyType.Vessel);
                 }
