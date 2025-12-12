@@ -1,13 +1,11 @@
 package gg.group3.justgo;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+
 import gg.group3.justgo.managers.SoundManager;
-import gg.group3.justgo.screens.GameScreen;
-import gg.group3.justgo.screens.MainMenuScreen;
 import gg.group3.justgo.screens.SplashScreen;
 
 public class JustGo extends Game {
@@ -32,6 +30,7 @@ public class JustGo extends Game {
         audio.loadSound("wrong",   "audio/on_wrong.wav");
         audio.loadSound("pickup",  "audio/pickup.mp3");
         audio.loadSound("click",   "audio/select.mp3");   // You have this, let's use it!
+        audio.loadSound("splat",   "audio/splat.ogg");
 
         // Load Music
         audio.playMusic("audio/bg.mp3");
