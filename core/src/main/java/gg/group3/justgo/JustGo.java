@@ -29,6 +29,7 @@ public class JustGo extends Game {
         audio.loadSound("correct", "audio/on_correct.mp3");
         audio.loadSound("wrong",   "audio/on_wrong.wav");
         audio.loadSound("consume-potion",  "audio/consume-potion.mp3");
+        audio.loadSound("dagger-equip",  "audio/dagger-equip.MP3");
         audio.loadSound("click",   "audio/select.mp3");   // You have this, let's use it!
         audio.loadSound("splat",   "audio/splat.ogg");
         audio.loadSound("doorOpening",   "audio/doorOpening.mp3");
