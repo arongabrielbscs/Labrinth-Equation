@@ -3,7 +3,7 @@ i:atlas.png:atlas-22e9cbe1e3a6d73412312e7529052877.png:1231:image/png:1
 d:tilesets:tilesets:0:application/unknown:1
 b:tilesets/atlas.tsx:tilesets/atlas-975cc19c0c0bc369d765fd865819e92c.tsx:806:application/unknown:1
 b:atlas.aseprite:atlas-5d6252938632210951d5de3d6f65f098.aseprite:5583:application/unknown:1
-t:assets.txt:assets-3e530207b243c40d0de9006b6021dba0.txt:637:text/plain:1
+t:assets.txt:assets-1a8239c9031d0d10b21168b9387924b0.txt:660:text/plain:1
 d:images:images:0:application/unknown:1
 i:images/atlas.png:images/atlas-1979365754b2b3aee9f28bdb015f39d3.png:7803:image/png:1
 i:images/title.png:images/title-35e92ad5de72459e2cbb3b192fa825fb.png:62602:image/png:1
@@ -33,6 +33,7 @@ a:audio/on_wrong.wav:audio/on_wrong-5d20559e3178c10e90ccb10131039996.wav:366016:
 a:audio/select.mp3:audio/select-19a355e0f7d0fcb8b68808e7309109d7.mp3:32256:audio/mpeg:1
 a:audio/on_correct.mp3:audio/on_correct-bc9adfdc3fee2521ae60d2df94b211a6.mp3:87771:audio/mpeg:1
 a:audio/consume-potion.mp3:audio/consume-potion-3572b6d43ac10db76a317c8b00aee56a.mp3:13921:audio/mpeg:1
+a:audio/dagger-equip.MP3:audio/dagger-equip-aef514922cafd28c3fba2d1a02192da2.MP3:16768:audio/mpeg:1
 a:audio/boss_hit.mp3:audio/boss_hit-3488093a776c4dd243604f09eb07ce3b.mp3:45312:audio/mpeg:1
 a:audio/player-move.wav:audio/player-move-199c9ba74ce0289d0afc44ac5ffeee4d.wav:38216:audio/x-wav:1
 d:levels:levels:0:application/unknown:1
