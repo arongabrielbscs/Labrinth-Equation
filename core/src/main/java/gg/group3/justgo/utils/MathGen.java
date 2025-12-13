@@ -198,13 +198,13 @@ public class MathGen {
 
     public static MathGen getForLevel(int level, boolean isBoss) {
         // Bosses get harder scalar/difficulty
-        int difficulty = isBoss ? 2 : 1;
+        int difficulty = isBoss ? 10 : 5;
 
         switch (level) {
-            case 2:
+            case 3:
                 // Level 2: Percentages (Scale max number by difficulty)
                 return generatePercentage(isBoss ? 200 : 50);
-            case 3:
+            case 2:
                 // Level 3: Algebra (Scale x range by difficulty)
                 return generateFindX(difficulty);
             case 1:
